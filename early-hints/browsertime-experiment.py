@@ -31,7 +31,7 @@ def run_one_experiment(browser, early_hints, url):
         ]
         if not early_hints:
             command += [
-                    "--browsertime-arg", '--chrome.args="--disable-features=EarlyHintsPreloadForNavigation"',
+                    "--browsertime-arg", 'chrome.args=disable-features=EarlyHintsPreloadForNavigation',
             ]
     else:
         raise ValueError("unsupported browser")

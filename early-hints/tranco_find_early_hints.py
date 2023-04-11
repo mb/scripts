@@ -7,6 +7,21 @@
 # Author: Manuel Bucher <dev@manuelbucher.com>
 # Date: 2023-04-11
 
+# This script uses curl to scrape the top x websites for Early Hints.  It
+# essentially just downloads the main page of each domain (with and without
+# the 'www.' prefix) including the http headers and stores the result in the
+# 'early-hint/' directory. It uses the tranco list[1] as input.
+# To get a list of the domains the following bash commands can be used
+# 
+#     $ rg '^HTTP/' | rg ' 103' | awk -F '_' '{ print $1 }' | sed 's/+.*+//' | sed 's/www\.//' | sort | uniq | tee ../domains.csv | wc -l
+#     $ xsv join --no-headers 1 ../domains.csv 2 ../tranco_PZJ8J.csv | xsv select 2,3 | sort -h
+#
+# Using ripgrep[2] and xsv[3] utilities
+# 
+# [1]: https://tranco-list.eu/
+# [2]: https://github.com/BurntSushi/ripgrep
+# [3]: https://github.com/BurntSushi/xsv
+
 import os.path
 import time
 import subprocess

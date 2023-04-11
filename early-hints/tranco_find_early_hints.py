@@ -14,9 +14,9 @@
 # To get a list of the domains the following bash commands can be used
 # 
 #     $ rg '^HTTP/' | rg ' 103' | awk -F '_' '{ print $1 }' | sed 's/+.*+//' | sed 's/www\.//' | sort | uniq | tee ../domains.csv | wc -l
-#     $ xsv join --no-headers 1 ../domains.csv 2 ../tranco_PZJ8J.csv | xsv select 2,3 | sort -h
+#     $ xsv join --no-headers 1 ../domains.csv 2 ../tranco_PZJ8J.csv | xsv select 2,3 | sort -h | tee top100.csv
 #
-# Using ripgrep[2] and xsv[3] utilities
+# Using ripgrep[2] and xsv[3] utilities. The resulting top100.csv can be found in the same directory.
 # 
 # [1]: https://tranco-list.eu/
 # [2]: https://github.com/BurntSushi/ripgrep

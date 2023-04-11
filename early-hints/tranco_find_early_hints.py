@@ -16,11 +16,15 @@
 #     $ rg '^HTTP/' | rg ' 103' | awk -F '_' '{ print $1 }' | sed 's/+.*+//' | sed 's/www\.//' | sort | uniq | tee ../domains.csv | wc -l
 #     $ xsv join --no-headers 1 ../domains.csv 2 ../tranco_PZJ8J.csv | xsv select 2,3 | sort -h | tee top100.csv
 #
-# Using ripgrep[2] and xsv[3] utilities. The resulting top100.csv can be found in the same directory.
+# Using ripgrep[2] and xsv[3] utilities. The resulting top100.csv can be found
+# in the same directory.  It would have been better to store the headers
+# separatly with `-D headers.txt` as described in the `-i` introduction blog
+# post[4].
 # 
 # [1]: https://tranco-list.eu/
 # [2]: https://github.com/BurntSushi/ripgrep
 # [3]: https://github.com/BurntSushi/xsv
+# [4]: https://daniel.haxx.se/blog/2022/03/24/easier-header-picking-with-curl/
 
 import os.path
 import time

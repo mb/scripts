@@ -52,6 +52,7 @@ def run_one_experiment(path, browser, early_hints, connectivity, url):
             "--browsertime.cacheClearRaw",
             "--xvfbParams.display", "0",
             #"--xvfb",
+            "--prettyPrint",
             "--speedIndex",
             "--visualMetrics",
             "--videoParams.keepOriginalVideo",
@@ -64,7 +65,7 @@ def run_one_experiment(path, browser, early_hints, connectivity, url):
                 "--browser", "chrome",
                 "--chrome.chromedriverPath", "/usr/bin/chromedriver",
                 "--chrome.binaryPath", "/usr/bin/google-chrome-stable",
-                "--chrome.args=--no-default-browser-check"
+                "--chrome.args=--no-default-browser-check",
         ]
         if not early_hints:
             command += [
@@ -79,11 +80,11 @@ def run_one_experiment(path, browser, early_hints, connectivity, url):
 def main():
     import sys
     if len(sys.argv) != 2:
-        print("usage:", argv[0], "out_path")
+        print("usage:", sys.argv[0], "out_path")
     out_path = sys.argv[1] 
     os.makedirs(out_path, exist_ok=True)
 
-    connectivities = ["cable", "4g", "3g", "3gfast"]
+    connectivities = ["3gfast", "cable", "4g", "3g"]
     urls = [url.strip() for url in open("domains.txt")]
     for c in connectivities:
         for url in urls:

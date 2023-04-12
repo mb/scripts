@@ -28,6 +28,7 @@ def run_one_experiment(browser, early_hints, url):
                 "--app", "chrome",
                 "--binary", "/usr/bin/google-chrome-stable",
                 "--browsertime-chromedriver", "/usr/bin/chromedriver",
+                "--browsertime-no-ffwindowrecorder",
         ]
         if not early_hints:
             command += [

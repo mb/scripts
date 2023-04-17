@@ -35,7 +35,12 @@ def main():
     for d in dirs:
         print(d)
         _, browser, time, connection, domain, eh = d.split('_')
-        if connection != '3gfast':
+        if domain == "www.ozon.ru" or \
+                domain == "www.thredup.com" or \
+                domain == "www.vseinstrumenti.ru" or \
+                domain == "www.fiverr.com" or \
+                domain == "padlet.com":
+            # skip domains where I ran into rate limits
             continue
         eh = eh == "earlyhints" # true for earhy hints enabled
         browsertime_info = d + "/browsertime.har"

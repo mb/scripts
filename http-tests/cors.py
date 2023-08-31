@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import socket
 
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -21,6 +20,8 @@ import socket
 #
 # This creates a http server that always sets CORS headers to allow the fetch
 # content is always "ok"
+
+import socket
 
 def main():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:

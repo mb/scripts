@@ -13,6 +13,12 @@
 -- parameter:
 --  * db: telementry.main, telemetry.main_1pct
 
+DECLARE start_date DATE DEFAULT DATE("2023-05-10");
+DECLARE end_date DATE DEFAULT DATE("2023-06-10");
+DECLARE in_version STRING DEFAULT "114.0b";
+DECLARE channel STRING DEFAULT "beta";
+DECLARE experiment STRING DEFAULT "early-hints-performance";
+
 SELECT
     client_id,
     SAFE.PARSE_DATE('%F', SUBSTR(payload.info.subsession_start_date, 0, 10)) AS submission_date,

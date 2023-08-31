@@ -10,9 +10,6 @@
 -- This query extracts and caches all telemetry data for the experiment in an
 -- intermediate table for further analysis.
 
--- parameter:
---  * db: telementry.main, telemetry.main_1pct
-
 DECLARE start_date DATE DEFAULT DATE("2023-06-10");
 DECLARE end_date DATE DEFAULT DATE("2023-07-10");
 DECLARE in_version STRING DEFAULT "115.0b";
@@ -31,7 +28,7 @@ SELECT
     REPLACE(RTRIM(prestar, '_'), '_', '-') AS server_response,
     mozfun.map.get_key(payload.processes.content.keyed_histograms.EH_PERF_PAGE_LOAD_TIME_MS, prestar) AS page_load_time,
     mozfun.map.get_key(payload.processes.content.keyed_histograms.EH_PERF_FIRST_CONTENTFUL_PAINT_MS, prestar) AS first_contentful_paint
-FROM {{db}}, UNNEST(['preconnect_', 'preload_0', 'preload_1', 'preconnect_preload_0', 'preconnect_preload_1']) prestar
+FROM telemetry.main, UNNEST(['preconnect_', 'preload_0', 'preload_1', 'preconnect_preload_0', 'preconnect_preload_1']) prestar
 WHERE DATE(submission_timestamp) >= start_date
     AND DATE(submission_timestamp) <= end_date
     AND normalized_channel = channel

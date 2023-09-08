@@ -7,6 +7,18 @@
 -- BigQuery Link: https://sql.telemetry.mozilla.org/queries/94315
 -- Repository: https://github.com/mb/one-time-scripts
 
+-- Parameters:
+--  * table:
+--    * cached_query_94297 (2nd experiment) or
+--    * cached_query_94296 (1st experiment)
+--  * server_response:
+--    * "preconnect"
+--    * "preload%"
+--    * "preconnect-preload%"
+--  * metric:
+--    * page_load_time
+--    * first_contentful_paint
+
 WITH extract AS (
     -- going from '{"bucket_count":100,"histogram_type":0,"sum":1396,"range":[1,50000],"values":{"1183":0,"1302":1,"1433":0}}'
     -- to '{"1183":0,"1302":1,"1433":0}}'
@@ -14,7 +26,7 @@ WITH extract AS (
         experiment_branch,
         client_id,
         server_response,
-        json_extract(first_contentful_paint, "$.values") as vs
+        json_extract({{metric}}, "$.values") as vs
     FROM {{table}}
     WHERE server_response LIKE {{server_response}}
 ), extracted AS (

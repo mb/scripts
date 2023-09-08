@@ -7,6 +7,17 @@
 -- BigQuery Link: https://sql.telemetry.mozilla.org/queries/94315
 -- Repository: https://github.com/mb/one-time-scripts
 
+-- Generates function values for the probability density function [PDF]
+-- and cumulative distribution function [CDF]. Also interesting, but
+-- possible only with advanced tooling would be to display kernel density
+-- estimation [KDE] for the PDF and the empirical cumulative distribution
+-- function [eCDF] for the CDF.
+--
+-- [PDF]: https://en.wikipedia.org/w/index.php?title=Probability_density_function&oldid=1172411601
+-- [CDF]: https://en.wikipedia.org/w/index.php?title=Cumulative_distribution_function&oldid=1161135407
+-- [KDE]: https://en.wikipedia.org/w/index.php?title=Kernel_density_estimation&oldid=1169216425
+-- [eCDF]: https://en.wikipedia.org/w/index.php?title=Empirical_distribution_function&oldid=1170611115
+--
 -- Parameters:
 --  * table:
 --    * cached_query_94297 (2nd experiment) or

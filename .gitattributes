@@ -1,0 +1,3 @@
+# https://github.com/github/markup/issues/348#issuecomment-868839500
+*.sql linguist-detectable=true
+*.sql linguist-language=sql

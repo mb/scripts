@@ -56,15 +56,23 @@ WITH extract AS (
     -- '*1.0' to convert to float
     SELECT experiment_branch, client_id, ms, s*1.0 as s, (s*1.0 / total) as c
     FROM by_users NATURAL JOIN total_by_users
+), pdf AS (
+    SELECT
+        experiment_branch,
+        ms,
+        SUM(s) AS by_clients,
+        SUM(c) AS normalized_by_client
+    FROM normalize
+    GROUP BY experiment_branch, ms
 )
 
 -- calculate cdf
 SELECT
     experiment_branch,
     ms,
-    SUM(s) AS by_clients,
-    SUM(s) OVER (PARTITION BY experiment_branch ORDER BY ms) / SUM(s) OVER (PARTITION BY experiment_branch) AS by_client_cdf,
-    SUM(c) AS normalized_by_client,
-    SUM(c) OVER (PARTITION BY experiment_branch ORDER BY ms) / SUM(c) OVER (PARTITION BY experiment_branch) AS normalized_by_client_cdf
-FROM normalize
+    by_clients,
+    SUM(by_clients) OVER (PARTITION BY experiment_branch ORDER BY ms) / SUM(by_clients) OVER (PARTITION BY experiment_branch) AS by_client_cdf,
+    normalized_by_client,
+    SUM(normalized_by_client) OVER (PARTITION BY experiment_branch ORDER BY ms) / SUM(normalized_by_client) OVER (PARTITION BY experiment_branch) AS normalized_by_client_cdf
+FROM pdf
 GROUP BY experiment_branch, ms

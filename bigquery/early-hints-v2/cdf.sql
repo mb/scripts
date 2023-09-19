@@ -20,6 +20,7 @@
 --
 -- Parameters:
 --  * table:
+--    * cached_query_94671 (3rd experiment) or
 --    * cached_query_94297 (2nd experiment) or
 --    * cached_query_94296 (1st experiment)
 --  * server_response:
@@ -41,22 +42,27 @@ WITH extract AS (
     FROM {{table}}
     WHERE server_response LIKE {{server_response}}
 ), extracted AS (
+    -- buckets to columns
     SELECT experiment_branch, client_id, CAST(j.key AS INTEGER) as ms, j.value as c
     FROM extract t, json_each(vs) j
     WHERE c != 0
 ), by_users AS (
+    -- accumulate each histogram bucket per user
     SELECT experiment_branch, client_id, ms, SUM(c) as s
     FROM extracted
     GROUP BY experiment_branch, client_id, ms
 ), total_by_users AS (
+    -- calculate total amount of requests per user
     SELECT experiment_branch, client_id, SUM(c) as total
     FROM extracted
     GROUP BY experiment_branch, client_id
 ), normalize AS (
-    -- '*1.0' to convert to float
+    -- normalize each user histogram
+    -- '*1.0' to convert to float, s: sum, c: normalized sum
     SELECT experiment_branch, client_id, ms, s*1.0 as s, (s*1.0 / total) as c
     FROM by_users NATURAL JOIN total_by_users
 ), pdf AS (
+    -- accumulate each bucket
     SELECT
         experiment_branch,
         ms,
@@ -66,7 +72,7 @@ WITH extract AS (
     GROUP BY experiment_branch, ms
 )
 
--- calculate cdf
+-- calculate cdf from pdf
 SELECT
     experiment_branch,
     ms,
@@ -75,4 +81,3 @@ SELECT
     normalized_by_client,
     SUM(normalized_by_client) OVER (PARTITION BY experiment_branch ORDER BY ms) / SUM(normalized_by_client) OVER (PARTITION BY experiment_branch) AS normalized_by_client_cdf
 FROM pdf
-GROUP BY experiment_branch, ms

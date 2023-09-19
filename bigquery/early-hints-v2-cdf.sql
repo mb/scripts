@@ -5,7 +5,7 @@
 -- Author: Manuel Bucher <dev@manuelbucher.com>
 -- Date: 2023-09-11
 -- BigQuery Link: https://sql.telemetry.mozilla.org/queries/92826
--- Repository: https://github.com/mb/one-time-scripts
+-- Repository: https://github.com/mb/scripts
 
 DECLARE end_date DATE DEFAULT CURRENT_DATE;
 DECLARE start_date DATE DEFAULT DATE_SUB(end_date, INTERVAL 14 DAY);

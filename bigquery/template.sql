@@ -5,4 +5,4 @@
 -- Author: Manuel Bucher <dev@manuelbucher.com>
 -- Date:
 -- BigQuery Link:
--- Repository: https://github.com/mb/one-time-scripts
+-- Repository: https://github.com/mb/scripts

@@ -4,7 +4,7 @@
 
 -- Author: Manuel Bucher <dev@manuelbucher.com>
 -- Date: 2023-09-07
--- Repository: https://github.com/mb/one-time-scripts
+-- Repository: https://github.com/mb/scripts
 
 -- Example on how to extract histogram data in sqlite
 -- Result:

@@ -5,7 +5,7 @@
 -- Author: Manuel Bucher <dev@manuelbucher.com>
 -- Date: 2023-08-31
 -- BigQuery Link: https://sql.telemetry.mozilla.org/queries/93053
--- Repository: https://github.com/mb/one-time-scripts
+-- Repository: https://github.com/mb/scripts
 
 -- This script was used to extract the telemetry data and later publish it on
 -- the necko blog: https://mozilla-necko.github.io

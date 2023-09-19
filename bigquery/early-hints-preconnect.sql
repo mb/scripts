@@ -5,7 +5,7 @@
 -- Author: Manuel Bucher <dev@manuelbucher.com>
 -- Date: 2023-09-19
 -- BigQuery Link: https://sql.telemetry.mozilla.org/queries/94671
--- Repository: https://github.com/mb/one-time-scripts
+-- Repository: https://github.com/mb/scripts
 
 -- This query extracts and caches all telemetry data for the experiment in an
 -- intermediate table for further analysis.

@@ -5,7 +5,7 @@
 -- Author: Manuel Bucher <dev@manuelbucher.com>
 -- Date: 2023-09-07
 -- BigQuery Link: https://sql.telemetry.mozilla.org/queries/94315
--- Repository: https://github.com/mb/one-time-scripts
+-- Repository: https://github.com/mb/scripts
 
 WITH extract  AS (
     -- going from '{"bucket_count":100,"histogram_type":0,"sum":1396,"range":[1,50000],"values":{"1183":0,"1302":1,"1433":0}}'

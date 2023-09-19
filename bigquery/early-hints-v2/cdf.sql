@@ -5,7 +5,7 @@
 -- Author: Manuel Bucher <dev@manuelbucher.com>
 -- Date: 2023-09-07
 -- BigQuery Link: https://sql.telemetry.mozilla.org/queries/94315
--- Repository: https://github.com/mb/one-time-scripts
+-- Repository: https://github.com/mb/scripts
 
 -- Generates function values for the probability density function [PDF]
 -- and cumulative distribution function [CDF]. Also interesting, but

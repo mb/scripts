@@ -14,6 +14,13 @@ import matplotlib.ticker as plticker
 import numpy as np
 import json
 
+try:
+    import tikzplotlib
+    OUTPUT_TEX = True
+except:
+    OUTPUT_TEX = False
+    print("For .tex output run: pip install tikzplotlib")
+
 CONNS = ['cable', '3g', '3gfast', '4g']
 METRICS = ['fcp', 'lcp']
 
@@ -96,6 +103,10 @@ def bar_chart(data, diagram):
 
     # add some text
     plt.savefig("relative-"+diagram+".png")
+    plt.savefig("relative-"+diagram+".svg")
+    plt.savefig("relative-"+diagram+".pgf")
+    if OUTPUT_TEX:
+        plt.savefig("relative-"+diagram+".tex")
 
 # https://stackoverflow.com/a/16598291
 def set_box_colors(bp):
@@ -141,6 +152,10 @@ def generate_plot(browser, data, label):
     ax.spines['left'].set_visible(False)
     ax.legend([bp["boxes"][0], bp["boxes"][1]], ["control", "early hints"], loc='center right')
     plt.savefig("boxplot-"+label+".png")
+    plt.savefig("boxplot-"+label+".pgf")
+    plt.savefig("boxplot-"+label+".svg")
+    if OUTPUT_TEX:
+        plt.savefig("boxplot-"+label+".tex")
 
 def main():
     browser = "chrome"

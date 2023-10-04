@@ -6,6 +6,7 @@
 
 # Author: Manuel Bucher <dev@manuelbucher.com>
 # Date: 2023-06-30
+# Bugzilla: https://bugzilla.mozilla.org/show_bug.cgi?id=1841626
 
 # This script is used in combination with `experiment-data.sql`
 

@@ -25,13 +25,16 @@ WITH per_build_client_day AS (
     SELECT
         client_id,
         CONCAT(mozfun.map.get_key(environment.experiments, "early-hints-performance-v2").branch, '_', RTRIM(prestar, '01_')) AS branch,
+        --mozfun.hist.normalize(
         mozfun.hist.merge(
             ARRAY_AGG(
                 mozfun.hist.extract(
                     mozfun.map.get_key(payload.processes.content.keyed_histograms.{{keyedprobe}}, prestar)
                 ) IGNORE NULLS
             )
-        ) AS extracted
+        )
+        --)
+        AS extracted
     FROM
         {{db}},
         UNNEST(['preconnect_', 'preload_0', 'preload_1', 'preconnect_preload_0', 'preconnect_preload_1']) prestar
@@ -83,5 +86,6 @@ as_struct AS (
 SELECT
     branch,
     LoadTime,
+    n as pdf,
     SUM(n) OVER (PARTITION BY branch ORDER BY LoadTime) / SUM(n) OVER (PARTITION BY branch) AS cdf,
 FROM summary

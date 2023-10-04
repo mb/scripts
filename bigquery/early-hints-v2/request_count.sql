@@ -14,7 +14,7 @@ WITH extract  AS (
         client_id,
         json_extract(first_contentful_paint, "$.values") as fcp,
         json_extract(page_load_time, "$.values") as plt
-    FROM cached_query_94297
+    FROM {{table}}
 )
 
 SELECT SUM(j.value) as count

@@ -4,7 +4,7 @@
 
 -- Author: Manuel Bucher <dev@manuelbucher.com>
 -- Date: 2023-09-07
--- BigQuery Link: https://sql.telemetry.mozilla.org/queries/94315
+-- BigQuery Link: https://sql.telemetry.mozilla.org/queries/94451
 -- Repository: https://github.com/mb/scripts
 
 -- Generates function values for the probability density function [PDF]

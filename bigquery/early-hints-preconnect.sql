@@ -34,4 +34,3 @@ WHERE DATE(submission_timestamp) >= start_date
     AND mozfun.map.get_key(environment.experiments, experiment).branch IS NOT NULL
     AND (mozfun.map.get_key(payload.processes.content.keyed_histograms.EH_PERF_PAGE_LOAD_TIME_MS, prestar) IS NOT NULL
       OR mozfun.map.get_key(payload.processes.content.keyed_histograms.EH_PERF_FIRST_CONTENTFUL_PAINT_MS, prestar) IS NOT NULL)
-

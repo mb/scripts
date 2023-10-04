@@ -114,6 +114,16 @@ def bar_chart(data, diagram):
                 improvements(data['v2']['page_load_time']['eh-disabled'][1], data['v2']['page_load_time']['eh-enabled'][1]),
                 improvements(data['v2']['page_load_time']['eh-disabled'][2], data['v2']['page_load_time']['eh-enabled'][2]),
             ),
+            'fcp-v3': (
+                improvements(data['v3']['fcp']['eh-disabled'][0], data['v3']['fcp']['eh-preconnect-enabled'][0]),
+                improvements(data['v3']['fcp']['eh-disabled'][1], data['v3']['fcp']['eh-preconnect-enabled'][1]),
+                improvements(data['v3']['fcp']['eh-disabled'][2], data['v3']['fcp']['eh-preconnect-enabled'][2]),
+            ),
+            'page-load-v3': (
+                improvements(data['v3']['page_load_time']['eh-disabled'][0], data['v3']['page_load_time']['eh-preconnect-enabled'][0]),
+                improvements(data['v3']['page_load_time']['eh-disabled'][1], data['v3']['page_load_time']['eh-preconnect-enabled'][1]),
+                improvements(data['v3']['page_load_time']['eh-disabled'][2], data['v3']['page_load_time']['eh-preconnect-enabled'][2]),
+            ),
     }
     print(means)
     x = np.arange(3)
@@ -148,10 +158,16 @@ def bar_chart(data, diagram):
     plt.savefig("relative-"+diagram+".png")
 
 def main():
-    files = ["v1", "v2"]
+    files = ["v1", "v2", "v3"]
 
     rel_imp = {}
     for file in files:
+        if file == "v1" or file == "v2":
+            file_name = f"processed-early-hints-performance-{file}.tsv"
+        elif file == "v3":
+            file_name = "processed-early-hints-preconnect.tsv"
+        else:
+            raise ValueError
         pgt = init()
         fcp = init()
         first = True
@@ -161,11 +177,14 @@ def main():
         num_loads = 0
         loads_per_client = {}
 
-        for line in open(f"processed-early-hints-performance-{file}.tsv"):
+        for line in open(file_name):
             if first:
                 first = False
                 continue
-            date, client_id, experiment_branch, eh_response_rel, page_load_time_ms, first_contentful_paint_ms = line.split('\t')
+            if file == "v3":
+                client_id, experiment_branch, eh_response_rel, page_load_time_ms, first_contentful_paint_ms = line.split('\t')
+            else:
+                date, client_id, experiment_branch, eh_response_rel, page_load_time_ms, first_contentful_paint_ms = line.split('\t')
 
             if experiment_branch == 'eh-disabled' and eh_response_rel.endswith('_1'):
                 continue

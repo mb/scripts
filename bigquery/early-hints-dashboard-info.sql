@@ -15,7 +15,7 @@ WITH temp_data AS (
         'early-hints-preconnect' AS name,
         '2023-09-18' AS experiment_start,
         '2023-09-25' AS enrolment_end,
-        '2023-10-09' AS experiment_end
+        '2023-10-10' AS experiment_end
     UNION ALL
     SELECT
         'cached_query_94297'AS cached_table,

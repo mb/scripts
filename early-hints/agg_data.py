@@ -28,7 +28,6 @@ def linear_interpolation(p, xs, ys):
     return x1 + inverse_m * (p - y1)
 
 def main():
-    inp = json.load(open("2023-10-10_agg_data.json"))
     inp = json.load(open("2023-10-11_agg_data_norm.json"))
     fig, axs = plt.subplots(2, 2)
     fig.suptitle("Early Hints Preconnect experiment")

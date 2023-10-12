@@ -51,11 +51,11 @@ class Counter(object):
 
 
 def get_urls():
-    l = open('tranco_PZJ8J.csv').readlines()
+    l = open('tranco_X532N.csv').readlines()
     urls = []
     for (cur, line) in enumerate(l):
         urls.append((cur,line))
-        if cur > 30000:
+        if cur > 40000:
             return urls
 
 URLS = get_urls()
@@ -112,27 +112,13 @@ def request(host, i, rank):
     if os.path.isfile(fname):
         return
     print(host, i)
-    out = subprocess.run(["curl", "--connect-timeout", "6", "-iL", "https://" + host], capture_output=True)
-    with open(fname, "wb") as f:
-        f.write(out.stdout)
-        f.close()
+    out = subprocess.run(["curl", "--connect-timeout", "6", "--dump-header", fname, "-L", "https://" + host], capture_output=True)
     time.sleep(1)
 
 def main():
     c = Counter()
-    ps = [
-            Process(target=process0, args=(c,)),
-            Process(target=process1, args=(c,)),
-            Process(target=process2, args=(c,)),
-            Process(target=process3, args=(c,)),
-            Process(target=process4, args=(c,)),
-            Process(target=process5, args=(c,)),
-            Process(target=process6, args=(c,)),
-            Process(target=process7, args=(c,)),
-            Process(target=process8, args=(c,)),
-            Process(target=process9, args=(c,)),
-            Process(target=process10, args=(c,)),
-          ]
+
+    ps = [Process(target=process, args=(i, c)) for i in range(10)]
     for p in ps:
         p.start()
 

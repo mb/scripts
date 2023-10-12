@@ -68,15 +68,22 @@ def main():
             old = pcts["eh-disabled"][i]
             new = pcts["eh-preconnect-enabled"][i]
             # https://stackoverflow.com/a/28404036
-            print(f"{p}: {(new - old) / old * 100:.2f}%")
+            print(f"{p}: {(new - old) / old * 100:.2f}% = {old - new:.2f}ms faster")
         increase = []
-        for (i, p) in enumerate(ps):
-            old = pcts["eh-disabled"][i]
-            new = pcts["eh-preconnect-enabled"][i]
+        increase_ms = []
+        for (i, p) in enumerate(ps2):
+            old = pcts2["eh-disabled"][i]
+            new = pcts2["eh-preconnect-enabled"][i]
             # https://stackoverflow.com/a/28404036
             increase.append((new - old) / old * 100)
+            increase_ms.append(old-new)
         average = sum(increase) / len(increase)
-        print(f"average: {average:.2f}%")
+        average_ms = sum(increase_ms) / len(increase_ms)
+        print(f"average: {average:.2f}% = {average_ms:.2f}ms")
+        min_idx = increase_ms.index(min(increase_ms))
+        max_idx = increase_ms.index(max(increase_ms))
+        print(f"min: {ps2[min_idx]}: {increase[min_idx]:.2f}% = {increase_ms[min_idx]:.2f}ms faster")
+        print(f"max: {ps2[max_idx]}: {increase[max_idx]:.2f}% = {increase_ms[max_idx]:.2f}ms faster")
     for ax in axs:
         for a in ax:
             a.legend()

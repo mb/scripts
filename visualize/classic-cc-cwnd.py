@@ -37,6 +37,8 @@ def main():
     time = []
     cwnd = []
     bif = []
+    bif_limited = []
+    bif_limited_time = []
     idx = int(sys.argv[2])
     last_bytes_in_flight = 0
     last_state = ("SlowStart", 0)
@@ -57,6 +59,9 @@ def main():
             state = result.group(6)
             last_state = (state, now)
             new_acked = result.group(7)
+            if limited:
+                bif_limited.append(last_bytes_in_flight)
+                bif_limited_time.append(now)
         elif (result := events.match(line)) is not None:
             if int(result.group(2)) != idx:
                 continue
@@ -89,6 +94,7 @@ def main():
     fig, ax = plt.subplots()
     ax.plot(time, cwnd, label='cwnd')
     ax.plot(time, bif, '.-', label='bytes in flight')
+    ax.plot(bif_limited_time, bif_limited, 's', label='app_limited')
     for (event, color) in [('packet_sent', 'black'), ('packet_ack', 'green'), ('packet_lost', 'red')][0:1]:
         ax.scatter(ps[event][0], ps[event][1], label=event, s=10, color=color)
     ax.set_xlabel('time in s')

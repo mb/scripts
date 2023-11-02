@@ -99,6 +99,7 @@ def main():
         ax.scatter(ps[event][0], ps[event][1], label=event, s=10, color=color)
     ax.set_xlabel('time in s')
     ax.set_ylabel('bytes')
+    ax.set_title(sys.argv[1].split('/')[-1])
     plt.legend()
     ax.grid()
     plt.show()

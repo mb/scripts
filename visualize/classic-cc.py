@@ -90,7 +90,7 @@ def main():
     fig, ax = plt.subplots()
     ax.add_collection(line_segments)
     ax.add_collection(line_segments_lost)
-    ax.set_title('Plot test:lines with LineCollection')
+    ax.set_title(sys.argv[1].split('/')[-1])
     plt.grid()
     plt.xlim((0, max_pn))
     plt.ylim((0, max_delay))

@@ -114,7 +114,7 @@ def main():
         ax.plot(data[output]["time"], data[output]["cwnd"], label='cwnd')
         ax.plot(data[output]["time"], data[output]["bif"], '.-', label='bytes in flight')
         ax.plot(data[output]["bif_limited_time"], data[output]["bif_limited"], 's', label='app_limited')
-        for (event, color) in ['packet_sent', 'packet_lost']:
+        for event in ['packet_sent', 'packet_lost']:
             ax.scatter(data[output]["ps"][event]["time"], data[output]["ps"][event]["bif"], label=event, s=10, color=COLORS[event])
         ax.set_xlabel('time in s')
         ax.set_ylabel('bytes')

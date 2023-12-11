@@ -31,7 +31,7 @@ def get_time(line):
     return datetime.strptime(line.split(" UTC", 1)[0], "%Y-%m-%d %H:%M:%S.%f")
 
 def main():
-    if len(sys.argv) != 2:
+    if len(sys.argv) < 2:
         print("usage:", sys.argv[0], "LOG_FILE")
         return
 
@@ -46,7 +46,7 @@ def main():
 
         # event occurences
         "p": {}, # pn -> y-axis (bytes in flight after packet sent)
-        "ps": defaultdict(lambda: ([], [])), # x/y coords of packet_sent/_acked/_lost
+        "ps": defaultdict(lambda: defaultdict(lambda: [])), # x/y coords of packet_sent/_acked/_lost
     })
 
     for line in open(sys.argv[1]):
@@ -78,9 +78,11 @@ def main():
                         data[this]["last_state"] = ('CongestionAvoidance', now)
                     if data[this]["last_state"] == 'PersistentCongestion':
                         data[this]["last_state"] = ('SlowStart', now)
+                # only remember events for packets where we sent the packet
                 if pn in data[this]["p"]:
-                    data[this]["ps"][event][0].append(now)
-                    data[this]["ps"][event][1].append(data[this]["p"][pn])
+                    data[this]["ps"][event]["time"].append(now)
+                    data[this]["ps"][event]["bif"].append(data[this]["p"][pn])
+                    data[this]["ps"][event]["pn"].append(pn)
         elif (result := lost.search(line)) is not None:
             this = result.group(1)
             now = get_time(line)
@@ -97,16 +99,26 @@ def main():
         if len(data[el]["time"]) > output_num:
             output_num = len(data[el]["time"])
             output = el
+
+    COLORS = {
+            'packet_sent': 'black',
+            'packet_lost': 'red',
+            'packet_acked': 'green',
+    }
  
     fig, ax = plt.subplots()
-    ax.plot(data[output]["time"], data[output]["cwnd"], label='cwnd')
-    ax.plot(data[output]["time"], data[output]["bif"], '.-', label='bytes in flight')
-    ax.plot(data[output]["bif_limited_time"], data[output]["bif_limited"], 's', label='app_limited')
-    for (event, color) in [('packet_sent', 'black'), ('packet_ack', 'green'), ('packet_lost', 'red')][0:1]:
-        ax.scatter(data[output]["ps"][event][0], data[output]["ps"][event][1], label=event, s=10, color=color)
-    ax.set_xlabel('time in s')
-    ax.set_ylabel('bytes')
-    ax.set_title(sys.argv[1].split('/')[-1])
+    if len(sys.argv) > 2 and sys.argv[2] == "pn":
+        for event in ['packet_sent', 'packet_acked', 'packet_lost']:
+            ax.scatter(data[output]["ps"][event]["time"], data[output]["ps"][event]["pn"], label=event, s=10, color=COLORS[event])
+    else:
+        ax.plot(data[output]["time"], data[output]["cwnd"], label='cwnd')
+        ax.plot(data[output]["time"], data[output]["bif"], '.-', label='bytes in flight')
+        ax.plot(data[output]["bif_limited_time"], data[output]["bif_limited"], 's', label='app_limited')
+        for (event, color) in ['packet_sent', 'packet_lost']:
+            ax.scatter(data[output]["ps"][event]["time"], data[output]["ps"][event]["bif"], label=event, s=10, color=COLORS[event])
+        ax.set_xlabel('time in s')
+        ax.set_ylabel('bytes')
+        ax.set_title(sys.argv[1].split('/')[-1])
     plt.legend()
     ax.grid()
     plt.show()

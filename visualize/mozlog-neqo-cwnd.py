@@ -99,29 +99,41 @@ def main():
         if len(data[el]["time"]) > output_num:
             output_num = len(data[el]["time"])
             output = el
+    fig, axs = plt.subplots(2, 1)
 
-    COLORS = {
-            'packet_sent': 'black',
-            'packet_lost': 'red',
-            'packet_acked': 'green',
-    }
- 
-    fig, ax = plt.subplots()
-    if len(sys.argv) > 2 and sys.argv[2] == "pn":
-        for event in ['packet_sent', 'packet_acked', 'packet_lost']:
-            ax.scatter(data[output]["ps"][event]["time"], data[output]["ps"][event]["pn"], label=event, s=10, color=COLORS[event])
-    else:
-        ax.plot(data[output]["time"], data[output]["cwnd"], label='cwnd')
-        ax.plot(data[output]["time"], data[output]["bif"], '.-', label='bytes in flight')
-        ax.plot(data[output]["bif_limited_time"], data[output]["bif_limited"], 's', label='app_limited')
-        for event in ['packet_sent', 'packet_lost']:
-            ax.scatter(data[output]["ps"][event]["time"], data[output]["ps"][event]["bif"], label=event, s=10, color=COLORS[event])
-        ax.set_xlabel('time in s')
-        ax.set_ylabel('bytes')
-        ax.set_title(sys.argv[1].split('/')[-1])
-    plt.legend()
-    ax.grid()
+    # add plots
+    graph_pn(axs[0], data[output])
+    graph_cwnd(axs[1], data[output])
+
+    # configure graph
+    axs[0].set_title(sys.argv[1].split('/')[-1])
+    for ax in axs:
+        ax.grid()
+        ax.legend()
     plt.show()
+
+COLORS = {
+        'packet_sent': 'black',
+        'packet_lost': 'red',
+        'packet_acked': 'green',
+}
+ 
+# plot pn graph
+def graph_pn(ax, output_data):
+    for event in ['packet_sent', 'packet_acked', 'packet_lost']:
+        ax.scatter(output_data["ps"][event]["time"], output_data["ps"][event]["pn"], label=event, s=10, color=COLORS[event])
+    ax.set_xlabel('time in s')
+    ax.set_ylabel('packet_number')
+
+# plot cwnd graph
+def graph_cwnd(ax, output_data):
+    ax.plot(output_data["time"], output_data["cwnd"], label='cwnd')
+    ax.plot(output_data["time"], output_data["bif"], '.-', label='bytes in flight')
+    ax.plot(output_data["bif_limited_time"], output_data["bif_limited"], 's', label='app_limited')
+    for event in ['packet_sent', 'packet_lost']:
+        ax.scatter(output_data["ps"][event]["time"], output_data["ps"][event]["bif"], label=event, s=10, color=COLORS[event])
+    ax.set_xlabel('time in s')
+    ax.set_ylabel('bytes')
 
 if __name__ == '__main__':
     main()

@@ -28,7 +28,10 @@ PATTERN = r" on_packet_lost this=0x([0-9a-f]+), bytes_in_flight=(\d+), cwnd=(\d+
 lost = re.compile(PATTERN)
 
 def get_time(line):
-    return datetime.strptime(line.split(" UTC", 1)[0], "%Y-%m-%d %H:%M:%S.%f")
+    # allow garbage data before timestamp
+    timestamp = line.split(" UTC", 1)[0].split(' ')
+    timestamp = timestamp[-2] + " " + timestamp[-1]
+    return datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S.%f")
 
 def main():
     if len(sys.argv) < 2:

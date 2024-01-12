@@ -21,8 +21,8 @@ csv.register_dialect('mydialect', doublequote=True)
 def prepare_histogram(inp):
     if inp == "":
         return
-    inp = json.loads(inp)
-    out = {key: inp["values"][key] for key in inp["values"] if inp["values"][key] != 0}
+    out = json.loads(inp)
+    #out = {key: inp["values"][key] for key in inp["values"] if inp["values"][key] != 0}
     if len(out) == 0:
         return
     return out
@@ -32,7 +32,7 @@ def main():
         reader = list(csv.reader(f, dialect='mydialect'))[1:]
     data = {}
     for row in reader:
-        uuid, branch, response, page_load, fcp = row
+        uuid, _, branch, response, page_load, fcp = row
         #if day < "2023-05-16" or day > "2023-06-08": # experiment 1 date range
         #if day < "2023-06-14" or day > "2023-07-04": # experiment 2 date range
         #if day < "2023-09-20" or day > "2023-10-17": # experiment 2 date range

@@ -15,13 +15,26 @@ DECLARE end_date DATE DEFAULT DATE("{{ End Date }}"); -- CURRENT_DATE()
 DECLARE graph_duration INT64 DEFAULT {{ Time Range }}; -- 90
 DECLARE channel STRING DEFAULT "{{ channel }}"; -- "nightly", "beta", "stable"
 
+WITH timing_distribution AS (
 SELECT
-    DATE(submission_timestamp) AS day,
-    metrics.timing_distribution.bounce_tracking_protection_purge_duration
+    -- DATE(submission_timestamp) AS day,
+    SAFE_CAST(bucket.key AS INT64) AS duration_ns,
+    SUM(bucket.value) AS num
 FROM firefox_desktop.metrics AS m
+    CROSS JOIN UNNEST(metrics.timing_distribution.bounce_tracking_protection_purge_duration.values) AS bucket
 WHERE
     DATE(submission_timestamp) > DATE_SUB(end_date, INTERVAL graph_duration DAY)
     AND end_date > DATE(submission_timestamp)
     AND metrics.timing_distribution.bounce_tracking_protection_purge_duration IS NOT NULL
     AND normalized_channel = channel
-LIMIT 2
+    AND bucket.value > 0
+GROUP BY
+    -- day,
+    duration_ns
+)
+
+SELECT
+    (duration_ns / 1000000) AS duration_ms,
+    num
+FROM
+    timing_distribution

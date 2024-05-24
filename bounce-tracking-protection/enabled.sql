@@ -21,12 +21,11 @@ SELECT
     COUNTIF(metrics.boolean.bounce_tracking_protection_enabled_at_startup = true) AS enabled,
     COUNTIF(metrics.boolean.bounce_tracking_protection_enabled_at_startup = false) AS disabled,
     COUNTIF(metrics.boolean.bounce_tracking_protection_enabled_dry_run_mode_at_startup = true) AS dry,
-    COUNTIF(metrics.boolean.bounce_tracking_protection_enabled_dry_run_mode_at_startup = false) AS not_dry,
+    COUNTIF(metrics.boolean.bounce_tracking_protection_enabled_dry_run_mode_at_startup = false) AS normal,
 FROM firefox_desktop.metrics AS m
 WHERE
     DATE(submission_timestamp) > DATE_SUB(end_date, INTERVAL graph_duration DAY)
     AND end_date > DATE(submission_timestamp)
     AND metrics.boolean.bounce_tracking_protection_enabled_at_startup IS NOT NULL
     AND normalized_channel = channel
-GROUP BY
-    day
+GROUP BY day

@@ -15,7 +15,6 @@ DECLARE channel STRING DEFAULT "nightly";
 
 SELECT
     DATE(submission_timestamp) AS day,
-    client_info.app_display_version AS fx_version
     COUNTIF(metrics.boolean.bounce_tracking_protection_enabled_at_startup = true) AS enabled,
     COUNTIF(metrics.boolean.bounce_tracking_protection_enabled_at_startup = false) AS not_enabled,
     COUNTIF(metrics.boolean.bounce_tracking_protection_enabled_dry_run_mode_at_startup = true) AS dry,
@@ -27,4 +26,4 @@ WHERE
     AND metrics.boolean.bounce_tracking_protection_enabled_at_startup IS NOT NULL
     AND normalized_channel = channel
 GROUP BY
-    day, fx_version
+    day

@@ -8,15 +8,18 @@
 -- Repository: https://github.com/mb/scripts
 
 -- This query extract usage information on bouncetrackingprotection
+-- The following telemetry is aggregated:
+-- * https://dictionary.telemetry.mozilla.org/apps/firefox_desktop/metrics/bounce_tracking_protection_enabled_at_startup
+-- * https://dictionary.telemetry.mozilla.org/apps/firefox_desktop/metrics/bounce_tracking_protection_enabled_dry_run_mode_at_startup
 
-DECLARE end_date DATE DEFAULT CURRENT_DATE();
-DECLARE graph_duration INT64 DEFAULT 90;
-DECLARE channel STRING DEFAULT "nightly";
+DECLARE end_date DATE DEFAULT DATE("{{ End Date }}"); -- CURRENT_DATE()
+DECLARE graph_duration INT64 DEFAULT {{ Time Range }}; -- 90
+DECLARE channel STRING DEFAULT "{{ channel }}"; -- "nightly", "beta", "stable"
 
 SELECT
     DATE(submission_timestamp) AS day,
     COUNTIF(metrics.boolean.bounce_tracking_protection_enabled_at_startup = true) AS enabled,
-    COUNTIF(metrics.boolean.bounce_tracking_protection_enabled_at_startup = false) AS not_enabled,
+    COUNTIF(metrics.boolean.bounce_tracking_protection_enabled_at_startup = false) AS disabled,
     COUNTIF(metrics.boolean.bounce_tracking_protection_enabled_dry_run_mode_at_startup = true) AS dry,
     COUNTIF(metrics.boolean.bounce_tracking_protection_enabled_dry_run_mode_at_startup = false) AS not_dry,
 FROM firefox_desktop.metrics AS m

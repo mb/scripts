@@ -18,10 +18,9 @@ DECLARE channel STRING DEFAULT "{{ channel }}"; -- "nightly", "beta", "stable"
 
 SELECT
     DATE(submission_timestamp) AS day,
-    COUNTIF(metrics.boolean.bounce_tracking_protection_enabled_at_startup = true) AS enabled,
+    COUNTIF(metrics.boolean.bounce_tracking_protection_enabled_at_startup = true AND metrics.boolean.bounce_tracking_protection_enabled_dry_run_mode_at_startup = false) AS enabled,
+    COUNTIF(metrics.boolean.bounce_tracking_protection_enabled_at_startup = true AND metrics.boolean.bounce_tracking_protection_enabled_dry_run_mode_at_startup = true) AS dry,
     COUNTIF(metrics.boolean.bounce_tracking_protection_enabled_at_startup = false) AS disabled,
-    COUNTIF(metrics.boolean.bounce_tracking_protection_enabled_dry_run_mode_at_startup = true) AS dry,
-    COUNTIF(metrics.boolean.bounce_tracking_protection_enabled_dry_run_mode_at_startup = false) AS not_dry,
 FROM firefox_desktop.metrics AS m
 WHERE
     DATE(submission_timestamp) > DATE_SUB(end_date, INTERVAL graph_duration DAY)

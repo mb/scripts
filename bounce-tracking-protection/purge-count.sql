@@ -32,7 +32,7 @@ GROUP BY day
 ), total_enabled AS (
 SELECT
     DATE(submission_timestamp) AS day,
-    COUNT(*) AS enabled,
+    COUNT(DISTINCT client_info.client_id) AS enabled,
 FROM firefox_desktop.metrics AS m
 WHERE
     DATE(submission_timestamp) > DATE_SUB(end_date, INTERVAL graph_duration DAY)
@@ -46,7 +46,7 @@ GROUP BY day
 SELECT
     agg_info.day,
     total_enabled.enabled AS num_users,
-    num_users AS num_user_with_at_least_one_purge,
+    num_users AS num_users_with_at_least_one_purge,
     num_purges,
     (num_purges/num_users) AS purges_per_user_with_at_least_one_purge, -- purges per user with at least one purge
     (num_purges/total_enabled.enabled) AS purges_per_user -- this might include users that don't really use their browser

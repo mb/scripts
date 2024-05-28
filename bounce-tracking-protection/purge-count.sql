@@ -28,13 +28,29 @@ WHERE
     AND metrics.timing_distribution.bounce_tracking_protection_purge_duration IS NOT NULL
     AND normalized_channel = channel
     AND bucket.value > 0
-GROUP BY
-    day
+GROUP BY day
+), total_enabled AS (
+SELECT
+    DATE(submission_timestamp) AS day,
+    COUNT(*) AS enabled,
+FROM firefox_desktop.metrics AS m
+WHERE
+    DATE(submission_timestamp) > DATE_SUB(end_date, INTERVAL graph_duration DAY)
+    AND end_date > DATE(submission_timestamp)
+    AND metrics.boolean.bounce_tracking_protection_enabled_at_startup IS NOT NULL
+    AND normalized_channel = channel
+    AND metrics.boolean.bounce_tracking_protection_enabled_at_startup = true
+    AND metrics.boolean.bounce_tracking_protection_enabled_dry_run_mode_at_startup = false
+GROUP BY day
 )
 SELECT
-    day,
-    num_users,
+    agg_info.day,
+    total_enabled.enabled AS num_users,
+    num_users AS num_user_with_at_least_one_purge,
     num_purges,
-    (num_purges/num_users) AS purges_per_user
-FROM agg_info
+    (num_purges/num_users) AS purges_per_user_with_at_least_one_purge, -- purges per user with at least one purge
+    (num_purges/total_enabled.enabled) AS purges_per_user -- this might include users that don't really use their browser
+FROM
+    agg_info JOIN total_enabled
+    ON agg_info.day = total_enabled.day
 

@@ -19,7 +19,7 @@ WITH timing_distribution AS (
 SELECT
     -- DATE(submission_timestamp) AS day,
     SAFE_CAST(bucket.key AS INT64) AS duration_ns,
-    SUM(bucket.value) AS num
+    SUM(bucket.value) AS num,
 FROM firefox_desktop.metrics AS m
     CROSS JOIN UNNEST(metrics.timing_distribution.bounce_tracking_protection_purge_duration.values) AS bucket
 WHERE
@@ -31,10 +31,21 @@ WHERE
 GROUP BY
     -- day,
     duration_ns
-)
-
+ORDER BY duration_ns
+),
+cdf AS (
 SELECT
-    (duration_ns / 1000000) AS duration_ms,
-    num
-FROM
-    timing_distribution
+    (duration_ns / 1000000000) AS duration_s,
+    num,
+    SUM(num) OVER (ORDER BY duration_ns) AS culum_num,
+FROM timing_distribution
+),
+maxi AS (
+    SELECT MAX(culum_num) AS cdf_max,
+    FROM cdf
+)
+SELECT
+    duration_s,
+    num,
+    culum_num / cdf_max AS cdf
+FROM cdf, maxi

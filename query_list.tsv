@@ -11,3 +11,4 @@ early-hints/bigquery/early-hints-preload.sql	96816
 bounce-tracking-protection/enabled.sql	100094
 bounce-tracking-protection/purge-timing.sql	100095
 bounce-tracking-protection/purge-count.sql	100096
+bounce-tracking-protection/url-classified.sql	100097

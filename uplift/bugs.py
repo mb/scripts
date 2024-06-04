@@ -5,14 +5,19 @@
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 # Author: Manuel Bucher <dev@manuelbucher.com>
-# Date: Manuel Bucher
+# Date: 2024-06-04
 
 # Goes through commit history of tor browser and organizes patches to be
 # uplifted.
 
 import subprocess
 import yaml # pyyaml
-import pathlib
+from collections import defaultdict
+import re
+
+# dependency can be removed when using python 3.13: https://github.com/python/cpython/issues/73435
+from wcmatch import pathlib 
+#import pathlib
 
 def parse_mots(filename):
     mots = yaml.safe_load(open(filename))
@@ -22,7 +27,7 @@ def parse_mots(filename):
             # not needed for path -> bugzilla component resolution
             continue
         modules[module["name"]] = {
-            "includes": [pathlib.PurePath(f) for f in module["includes"]],
+            "includes": module["includes"],
             "machine_name": module["machine_name"]
         }
         if "meta" in module and module["meta"] is not None and "components" in module["meta"]:
@@ -31,27 +36,40 @@ def parse_mots(filename):
 
 MOTS = parse_mots("/home/user/dev/gecko/mots.yaml")
 
-def get_components(filename):
+def append_components(filename, components):
+    filename = pathlib.Path(filename)
     matches = []
     for component in MOTS:
         for pattern in MOTS[component]["includes"]:
-            print(filename, pattern)
-            if pattern.full_match(filename):
-                print("match:", component)
+            #print(filename, pattern)
+            if filename.match(pattern, flags=pathlib.GLOBSTAR):
+                components[component] += 1
 
 def parse_commit(ref):
     p = subprocess.run(["git", "show", "--format=raw", ref], capture_output=True)
     out = p.stdout.decode()
+
+    # Collect info about the commit
     info = {}
     files = {}
-    components = []
+    components = defaultdict(int)
     section = 0
     commit_message = ""
     num_changes = 0
     for line in out.split('\n'):
         # There are three sections: header, commit message, changed lines
-        if section < 2 and line.strip() == "":
+        if section < 2 and line == "":
             section += 1
+            if section == 2:
+                # apply some heuristics to stop on first non-tor commit
+                if "Differential Revision: https://phabricator.services.mozilla.com/" in commit_message:
+                    return None
+                if "r=" in commit_message or "r?" in commit_message:
+                    return None
+                if "release+treescript@mozilla.org" in info["author"]:
+                    return None
+                if "CLOSED TREE" in commit_message:
+                    return None
             continue
         if section == 0:
             name, value = line.strip().split(" ", 1)
@@ -64,11 +82,21 @@ def parse_commit(ref):
             if line.startswith('diff --git a/'):
                 filename = line.split(' ')[2]
                 filename = filename[2:]
-                components = get_components(filename)
+                append_components(filename, components)
                 files[filename] = components
 
+    # get bug information
+    bugs = re.findall(r"Bug \d+", commit_message)
+
+    return info["parent"]
+
 def main():
-    parse_commit("HEAD")
+    commit = "HEAD"
+    while True:
+        print("next_commit", commit)
+        commit = parse_commit(commit)
+        if commit is None:
+            break
 
 if __name__ == '__main__':
     main()

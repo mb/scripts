@@ -1,16 +1,16 @@
-From ea2e042952ae78527d8be07f028069e18f1852f9 Mon Sep 17 00:00:00 2001
+From a15b1abffda016c46880f7becf98731645ec0a0a Mon Sep 17 00:00:00 2001
 From: Manuel Bucher <manuel@mozilla.com>
-Date: Thu, 13 Jun 2024 12:59:57 +0200
+Date: Thu, 13 Jun 2024 19:27:48 +0200
 Subject: [PATCH] Bug # - Tor Proxy in Firefox
 
 ---
- toolkit/content/aboutNetworking.html          | 10 ++++
- toolkit/content/aboutNetworking.js            | 51 +++++++++++++++++++
- .../en-US/toolkit/about/aboutNetworking.ftl   |  3 ++
- 3 files changed, 64 insertions(+)
+ toolkit/content/aboutNetworking.html          | 14 ++++
+ toolkit/content/aboutNetworking.js            | 81 +++++++++++++++++++
+ .../en-US/toolkit/about/aboutNetworking.ftl   |  4 +
+ 3 files changed, 99 insertions(+)
 
 diff --git a/toolkit/content/aboutNetworking.html b/toolkit/content/aboutNetworking.html
-index 9b95e19eec9fb..ec826d80d6a52 100644
+index 9b95e19eec9fb..28f89b99d7bf8 100644
 --- a/toolkit/content/aboutNetworking.html
 +++ b/toolkit/content/aboutNetworking.html
 @@ -60,6 +60,9 @@
@@ -23,14 +23,18 @@ index 9b95e19eec9fb..ec826d80d6a52 100644
      </div>
      <div class="main-content">
        <div class="header">
-@@ -307,6 +310,13 @@
+@@ -307,6 +310,17 @@
            </tbody>
          </table>
        </div>
 +      <div id="tor" class="tab" hidden="true">
 +        <button
-+          data-l10n-id="about-networking-tor-start"
++          data-l10n-id="about-networking-tor-connect"
 +          id="tor_connect"
++        ></button>
++        <button
++          data-l10n-id="about-networking-tor-disconnect"
++          id="tor_disconnect"
 +        ></button>
 +        <div id="tor_output" style="white-space: pre-wrap"></div>
 +      </div>
@@ -38,7 +42,7 @@ index 9b95e19eec9fb..ec826d80d6a52 100644
    </body>
  </html>
 diff --git a/toolkit/content/aboutNetworking.js b/toolkit/content/aboutNetworking.js
-index fe68d6c10b0cc..a0d7097d3fb60 100644
+index fe68d6c10b0cc..9f3db100c954b 100644
 --- a/toolkit/content/aboutNetworking.js
 +++ b/toolkit/content/aboutNetworking.js
 @@ -19,6 +19,11 @@ const gNetLinkSvc =
@@ -53,17 +57,19 @@ index fe68d6c10b0cc..a0d7097d3fb60 100644
  const gRequestNetworkingData = {
    http: gDashboard.requestHttpConnections,
    sockets: gDashboard.requestSockets,
-@@ -294,6 +299,9 @@ function init() {
+@@ -294,6 +299,11 @@ function init() {
        sectionButton.click();
      }
    }
 +
 +  let torConnectButton = document.getElementById("tor_connect");
 +  torConnectButton.addEventListener("click", torConnect);
++  let torDisconnectButton = document.getElementById("tor_disconnect");
++  torDisconnectButton.addEventListener("click", torDisconnect);
  }
  
  function show(button) {
-@@ -421,3 +429,46 @@ function displayHTTPSRRLookup(data) {
+@@ -421,3 +431,74 @@ function displayHTTPSRRLookup(data) {
  
    parent.replaceChild(new_cont, cont);
  }
@@ -87,11 +93,24 @@ index fe68d6c10b0cc..a0d7097d3fb60 100644
 +  },
 +};
 +
++var artiState = "none";
++var arti = null;
++var torOnlyProxyFilter;
++
 +async function torConnect() {
 +  let environment = {
 +    NO_COLOR: "1",
 +  };
-+  let arti = Subprocess.call({
++  // only start it once.
++  if (artiState != "none") {
++    return;
++  }
++  artiState = "running";
++
++  torOnlyProxyFilter = new TorChannelFilter();
++  pps.registerChannelFilter(torOnlyProxyFilter, 11);
++
++  Subprocess.call({
 +    command: "/home/user/dev/arti/target/release/arti",
 +    arguments: ["proxy"],
 +    environmentAppend: true,
@@ -106,21 +125,37 @@ index fe68d6c10b0cc..a0d7097d3fb60 100644
 +        debugOutput.innerText += data;
 +        data = await pipe.readString();
 +      }
++      // arti shut down. Process not running anymore.
++      arti = null;
++      artiState = "none";
++      Services.obs.removeObserver(torDisconnect, "xpcom-shutdown");
 +    }
++    arti = proc;
++    Services.obs.addObserver(torDisconnect, "xpcom-shutdown");
 +    dumpPipe(proc.stdout);
 +  });
 +}
++
++function torDisconnect() {
++  if (artiState != "running") {
++    return;
++  }
++  artiState = "shutdown";
++  arti.kill();
++  pps.unregisterChannelFilter(torOnlyProxyFilter);
++}
 diff --git a/toolkit/locales/en-US/toolkit/about/aboutNetworking.ftl b/toolkit/locales/en-US/toolkit/about/aboutNetworking.ftl
-index 8be57fc2d750c..c37c6e07a6223 100644
+index 8be57fc2d750c..fc0d1bef7bb84 100644
 --- a/toolkit/locales/en-US/toolkit/about/aboutNetworking.ftl
 +++ b/toolkit/locales/en-US/toolkit/about/aboutNetworking.ftl
-@@ -66,3 +66,6 @@ about-networking-networkid-is-up = Link is up
+@@ -66,3 +66,7 @@ about-networking-networkid-is-up = Link is up
  about-networking-networkid-status-known = Link status is known
  
  ##
 +
 +about-networking-tor = Tor
-+about-networking-tor-start = Connect
++about-networking-tor-connect = Connect
++about-networking-tor-disconnect = Disconnect
 \ No newline at end of file
 -- 
 2.45.0

@@ -1,0 +1,182 @@
+From ca5df62a666c16e11e76a47ca5c386d432e50ecf Mon Sep 17 00:00:00 2001
+From: Manuel Bucher <manuel@mozilla.com>
+Date: Sat, 15 Jun 2024 19:08:52 +0200
+Subject: [PATCH 2/2] Bug # - Make tor a plugin
+
+---
+ browser/app/profile/firefox.js                |  3 +
+ toolkit/content/gmp-sources/arti.json         | 67 +++++++++++++++++++
+ toolkit/content/jar.mn                        |  2 +
+ .../en-US/toolkit/about/aboutAddons.ftl       |  3 +
+ toolkit/modules/GMPUtils.sys.mjs              |  8 ++-
+ .../extensions/internal/GMPProvider.sys.mjs   | 11 +++
+ 6 files changed, 93 insertions(+), 1 deletion(-)
+ create mode 100644 toolkit/content/gmp-sources/arti.json
+
+diff --git a/browser/app/profile/firefox.js b/browser/app/profile/firefox.js
+index 42b11d80be9b0..314faabd5b204 100644
+--- a/browser/app/profile/firefox.js
++++ b/browser/app/profile/firefox.js
+@@ -2012,6 +2012,9 @@ pref("identity.fxaccounts.commands.remoteTabManagement.enabled", false);
+ #endif
+ #endif
+ 
++pref("media.gmp-arti.visible", true);
++pref("media.gmp-arti.enabled", false);
++
+ pref("media.gmp-gmpopenh264.visible", true);
+ pref("media.gmp-gmpopenh264.enabled", true);
+ 
+diff --git a/toolkit/content/gmp-sources/arti.json b/toolkit/content/gmp-sources/arti.json
+new file mode 100644
+index 0000000000000..de8e3b944d381
+--- /dev/null
++++ b/toolkit/content/gmp-sources/arti.json
+@@ -0,0 +1,67 @@
++{
++  "hashFunction": "sha512",
++  "name": "Arti-2.3.2",
++  "schema_version": 1000,
++  "vendors": {
++    "gmp-gmpopenh264": {
++      "platforms": {
++        "Darwin_aarch64-gcc3": {
++          "fileUrl": "hxxp://ciscobinary.openh264.org/openh264-macosx64-aarch64-31c4d2e4a037526fd30d4e5c39f60885986cf865.zip",
++          "filesize": 0,
++          "hashValue": ""
++        },
++        "Darwin_x86_64-gcc3": {
++          "fileUrl": "hxxp://ciscobinary.openh264.org/openh264-macosx64-31c4d2e4a037526fd30d4e5c39f60885986cf865.zip",
++          "filesize": 0,
++          "hashValue": ""
++        },
++        "Linux_aarch64-gcc3": {
++          "fileUrl": "hxxp://ciscobinary.openh264.org/openh264-linux64-aarch64-31c4d2e4a037526fd30d4e5c39f60885986cf865.zip",
++          "filesize": 0,
++          "hashValue": ""
++        },
++        "Linux_x86-gcc3": {
++          "fileUrl": "hxxp://ciscobinary.openh264.org/openh264-linux32-31c4d2e4a037526fd30d4e5c39f60885986cf865.zip",
++          "filesize": 0,
++          "hashValue": ""
++        },
++        "Linux_x86_64-gcc3": {
++          "fileUrl": "https://lab.neon.rocks/arti-linux64-3cc4b10b13ede1a162efd14eb6775f892afe177d.zip",
++          "filesize": 7038436,
++          "hashValue": "7120b2dee81a899828efad42f6c2dcd885837707f58e5714e8b67f01194afa630fc260928dd68964b5120831cead7797875dca77b1af632e18e65300a39f2902"
++        },
++        "Linux_x86_64-gcc3-asan": {
++          "alias": "Linux_x86_64-gcc3"
++        },
++        "WINNT_aarch64-msvc-aarch64": {
++          "fileUrl": "hxxp://ciscobinary.openh264.org/openh264-win64-aarch64-31c4d2e4a037526fd30d4e5c39f60885986cf865.zip",
++          "filesize": 0,
++          "hashValue": ""
++        },
++        "WINNT_x86-msvc": {
++          "fileUrl": "hxxp://ciscobinary.openh264.org/openh264-win32-31c4d2e4a037526fd30d4e5c39f60885986cf865.zip",
++          "filesize": 0,
++          "hashValue": ""
++        },
++        "WINNT_x86-msvc-x64": {
++          "alias": "WINNT_x86-msvc"
++        },
++        "WINNT_x86-msvc-x86": {
++          "alias": "WINNT_x86-msvc"
++        },
++        "WINNT_x86_64-msvc": {
++          "fileUrl": "hxxp://ciscobinary.openh264.org/openh264-win64-31c4d2e4a037526fd30d4e5c39f60885986cf865.zip",
++          "filesize": 0,
++          "hashValue": ""
++        },
++        "WINNT_x86_64-msvc-x64": {
++          "alias": "WINNT_x86_64-msvc"
++        },
++        "WINNT_x86_64-msvc-x64-asan": {
++          "alias": "WINNT_x86_64-msvc"
++        }
++      },
++      "version": "2.3.2"
++    }
++  }
++}
+diff --git a/toolkit/content/jar.mn b/toolkit/content/jar.mn
+index dcdc237d626f6..94af11d697b0d 100644
+--- a/toolkit/content/jar.mn
++++ b/toolkit/content/jar.mn
+@@ -149,7 +149,9 @@ toolkit.jar:
+    content/global/gmp-sources/openh264.json    (gmp-sources/openh264.json)
+    content/global/gmp-sources/widevinecdm.json (gmp-sources/widevinecdm.json)
+    content/global/gmp-sources/widevinecdm_l1.json (gmp-sources/widevinecdm_l1.json)
++   content/global/gmp-sources/arti.json (gmp-sources/arti.json)
+ 
+ # Third party files
+    content/global/third_party/d3/d3.js                (/third_party/js/d3/d3.js)
+    content/global/third_party/cfworker/json-schema.js (/third_party/js/cfworker/json-schema.js)
++
+diff --git a/toolkit/locales/en-US/toolkit/about/aboutAddons.ftl b/toolkit/locales/en-US/toolkit/about/aboutAddons.ftl
+index dbdbfd063de3b..2efed8ff1b6df 100644
+--- a/toolkit/locales/en-US/toolkit/about/aboutAddons.ftl
++++ b/toolkit/locales/en-US/toolkit/about/aboutAddons.ftl
+@@ -554,6 +554,9 @@ details-notification-gmp-pending2 =
+ 
+ ## Gecko Media Plugins (GMPs)
+ 
++plugins-arti-name = Tor Arti
++plugins-arti-description = A Tor Rust Implementation
++
+ plugins-gmp-license-info = License information
+ plugins-gmp-privacy-info = Privacy Information
+ 
+diff --git a/toolkit/modules/GMPUtils.sys.mjs b/toolkit/modules/GMPUtils.sys.mjs
+index e2fee781e18c0..52837659d4a51 100644
+--- a/toolkit/modules/GMPUtils.sys.mjs
++++ b/toolkit/modules/GMPUtils.sys.mjs
+@@ -13,8 +13,14 @@ ChromeUtils.defineESModuleGetters(lazy, {
+ export const OPEN_H264_ID = "gmp-gmpopenh264";
+ export const WIDEVINE_L1_ID = "gmp-widevinecdm-l1";
+ export const WIDEVINE_L3_ID = "gmp-widevinecdm";
++export const ARTI = "gmp-arti";
+ 
+-export const GMP_PLUGIN_IDS = [OPEN_H264_ID, WIDEVINE_L1_ID, WIDEVINE_L3_ID];
++export const GMP_PLUGIN_IDS = [
++  OPEN_H264_ID,
++  WIDEVINE_L1_ID,
++  WIDEVINE_L3_ID,
++  ARTI,
++];
+ 
+ export var GMPUtils = {
+   /**
+diff --git a/toolkit/mozapps/extensions/internal/GMPProvider.sys.mjs b/toolkit/mozapps/extensions/internal/GMPProvider.sys.mjs
+index 22ca2365d15cb..4be64b0354f9c 100644
+--- a/toolkit/mozapps/extensions/internal/GMPProvider.sys.mjs
++++ b/toolkit/mozapps/extensions/internal/GMPProvider.sys.mjs
+@@ -17,6 +17,7 @@ ChromeUtils.defineESModuleGetters(lazy, {
+ });
+ 
+ import {
++  ARTI,
+   GMPPrefs,
+   GMPUtils,
+   OPEN_H264_ID,
+@@ -41,6 +42,16 @@ const GMP_PRIVACY_INFO = "plugins-gmp-privacy-info";
+ const GMP_LEARN_MORE = "learn_more_label";
+ 
+ const GMP_PLUGINS = [
++  {
++    id: ARTI,
++    name: "plugins-arti-name",
++    description: "plugins-arti-description",
++    level: "",
++    libName: "arti",
++    licenseURL:
++      "https://gitlab.torproject.org/tpo/core/arti/-/tree/main#license",
++    homepageURL: "https://www.torproject.org",
++  },
+   {
+     id: OPEN_H264_ID,
+     name: "plugins-openh264-name",
+-- 
+2.45.0
+

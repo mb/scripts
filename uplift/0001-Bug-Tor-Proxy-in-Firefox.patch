@@ -1,7 +1,7 @@
 From a15b1abffda016c46880f7becf98731645ec0a0a Mon Sep 17 00:00:00 2001
 From: Manuel Bucher <manuel@mozilla.com>
 Date: Thu, 13 Jun 2024 19:27:48 +0200
-Subject: [PATCH] Bug # - Tor Proxy in Firefox
+Subject: [PATCH 1/2] Bug # - Tor Proxy in Firefox
 
 ---
  toolkit/content/aboutNetworking.html          | 14 ++++

@@ -20,6 +20,7 @@ SELECT
     -- DATE(submission_timestamp) AS day,
     SAFE_CAST(bucket.key AS INT64) AS duration_ns,
     SUM(bucket.value) AS num,
+    SUM(IF (DATE(submission_timestamp) > DATE_SUB(end_date, INTERVAL 7 DAY), bucket.value, NULL)) AS num_recent
 FROM firefox_desktop.metrics AS m
     CROSS JOIN UNNEST(metrics.timing_distribution.bounce_tracking_protection_purge_duration.values) AS bucket
 WHERE
@@ -38,14 +39,18 @@ SELECT
     (duration_ns / 1000000000) AS duration_s,
     num,
     SUM(num) OVER (ORDER BY duration_ns) AS culum_num,
+    SUM(num_recent) OVER (ORDER BY duration_ns) AS culum_num_recent
 FROM timing_distribution
 ),
 maxi AS (
-    SELECT MAX(culum_num) AS cdf_max,
+    SELECT
+        MAX(culum_num) AS cdf_max,
+        MAX(culum_num_recent) AS cdf_max_recent,
     FROM cdf
 )
 SELECT
     duration_s,
     num,
-    culum_num / cdf_max AS cdf
+    culum_num / cdf_max AS cdf,
+    culum_num_recent / cdf_max_recent AS cdf_recent
 FROM cdf, maxi

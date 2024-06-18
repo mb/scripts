@@ -16,7 +16,8 @@ DECLARE channel STRING DEFAULT "{{ channel }}"; -- "nightly", "beta", "stable"
 
 SELECT
     DATE(submission_timestamp) AS day,
-    SUM(metrics.counter.bounce_tracking_protection_purge_count_classified_tracker) AS purge_count
+    "classified" AS label,
+    SUM(metrics.counter.bounce_tracking_protection_purge_count_classified_tracker) AS num_purges
 FROM firefox_desktop.metrics AS m
 WHERE
     DATE(submission_timestamp) > DATE_SUB(end_date, INTERVAL graph_duration DAY)
@@ -24,3 +25,18 @@ WHERE
     AND normalized_channel = channel
     AND metrics.counter.bounce_tracking_protection_purge_count_classified_tracker IS NOT NULL
 GROUP BY day
+
+UNION ALL -- https://stackoverflow.com/a/76917101
+
+SELECT
+    DATE(submission_timestamp) AS day,
+    bucket.key AS label,
+    SUM(bucket.value) AS num_purges
+FROM firefox_desktop.metrics AS m
+    CROSS JOIN UNNEST(metrics.labeled_counter.bounce_tracking_protection_purge_count) AS bucket
+WHERE
+    DATE(submission_timestamp) > DATE_SUB(end_date, INTERVAL graph_duration DAY)
+    AND end_date > DATE(submission_timestamp)
+    AND normalized_channel = channel
+    AND ARRAY_LENGTH(metrics.labeled_counter.bounce_tracking_protection_purge_count) != 0
+GROUP BY day, label

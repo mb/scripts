@@ -14,7 +14,7 @@
 
 DECLARE end_date DATE DEFAULT DATE("{{ End Date }}"); -- CURRENT_DATE()
 DECLARE graph_duration INT64 DEFAULT {{ Time Range }}; -- 90
-DECLARE channel STRING DEFAULT "{{ channel }}"; -- "nightly", "beta", "stable"
+DECLARE channel STRING DEFAULT "{{ channel }}"; -- "nightly", "beta", "release"
 
 SELECT
     DATE(submission_timestamp) AS day,

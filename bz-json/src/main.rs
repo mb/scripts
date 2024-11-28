@@ -1,11 +1,11 @@
-use serde_json::{json, Value};
+use serde_json::Value;
 use std::env;
 use url::Url;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
 
-    if args.len() < 2 {
+    if args.len() != 2 {
         eprintln!("Usage: {} <url>", args[0]);
         eprintln!("Pass Bugzilla URL from advanced search to convert to rest API JSON");
         std::process::exit(1);

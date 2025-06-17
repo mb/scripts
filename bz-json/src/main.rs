@@ -16,7 +16,20 @@ fn main() {
     // stable output order
     let mut map = indexmap::IndexMap::new();
     for (key, value) in url.query_pairs() {
-        map.insert(key, Value::String(value.to_string()));
+        if let Some(existing) = map.get_mut(&key) {
+            match existing {
+                Value::Array(arr) => arr.push(Value::String(value.to_string())),
+                Value::String(str) => {
+                    *existing = Value::Array(vec![
+                        Value::String(str.clone()),
+                        Value::String(value.to_string()),
+                    ])
+                }
+                _ => panic!("unreachable"),
+            }
+        } else {
+            map.insert(key, Value::String(value.to_string()));
+        }
     }
 
     println!("{}", serde_json::to_string_pretty(&map).unwrap());

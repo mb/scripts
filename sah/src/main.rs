@@ -38,13 +38,16 @@ impl Request {
                 <head><title>Storage-Access-API test ground</title></head>
                 <body>
                     <h1>Storage-Access-API test ground</h1>
-                    <a href="https://lab.yet.wiki/storage-access/
+                    <ul>
+                        <li><a href="https://sah.yet.wiki/storage-access/auth">Auth</a></li>
+                        <li><a href="https://sah.yet.wiki/storage-access/track">Track</a></li>
+                    </ul>
                     <h2>Main document headers</h2>
                     <p>Cookie: <span class="cookie">{cookie:?}</span></p>
                     <p>Permission-Policy: <span class="pp">{permission_policy:?}</span></p>
                     <p>Sec-Fetch-Storage-Access: <span class="sah">{sec_fetch_storage_access:?}</span></p>
                     <h2>CSS headers</h2>
-                    <link href="https://lab.yet.wiki/storage-access/style.css" rel="stylesheet" />
+                    <link href="https://sah.yet.wiki/storage-access/style.css" rel="stylesheet" />
                     <p>Cookie: <span id="css-cookie" class="cookie"></span></p>
                     <p>Permission-Policy: <span id="css-pp" class="pp"></span></p>
                     <p>Sec-Fetch-Storage-Access: <span id="css-sah" class="sah"></span></p>
@@ -53,9 +56,9 @@ impl Request {
                     <p>Permission-Policy: <span id="js-pp" class="pp"></span></p>
                     <p>Sec-Fetch-Storage-Access: <span id="js-sah" class="sah"></span></p>
                     <h2>Image headers</h2>
-                    <img src="https://lab.yet.wiki/storage-access/image.png"></img>
+                    <img src="https://sah.yet.wiki/storage-access/image.png"></img>
                     <h2>Iframe headers</h2>
-                    <iframe src="https://lab.yet.wiki/storage-access/iframe.html"></iframe>
+                    <iframe src="https://sah.yet.wiki/storage-access/iframe.html"></iframe>
                 </body>
             </html>"#,
             cookie = self.cookie,
@@ -77,11 +80,8 @@ impl Request {
 
         match endpoint {
             "" => self.main(),
-            _ => reply::with_status(
-                format!("Not found! \"{endpoint:?}\""),
-                StatusCode::NOT_FOUND,
-            )
-            .into_response(),
+            _ => reply::with_status(format!("Not found! {endpoint:?}"), StatusCode::NOT_FOUND)
+                .into_response(),
         }
     }
 }

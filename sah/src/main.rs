@@ -18,6 +18,7 @@
 //! * script-track -> tries to set unpartitioned state
 //! * image-track -> tries to set unpartitioned state
 
+use text_to_png::TextRenderer;
 use warp::{
     Filter,
     filters::path::Tail,
@@ -86,8 +87,18 @@ impl Request {
 }
 
 impl Request {
-    fn main(&self) -> Response {
+    fn main(&self, iframe: bool) -> Response {
         let domain = "https://sah.neon.rocks/storage-access";
+        let iframe_embed = if !iframe {
+            format!(
+                r#"
+                    <h2>Iframe headers <small>({domain}/iframe.html)</small></h2>
+                    <iframe src="{domain}/iframe.html" width="100%" height="2000"></iframe>
+                "#,
+            )
+        } else {
+            String::new()
+        };
         let response = format!(
             r#"<!DOCTYPE html>
             <html>
@@ -150,8 +161,7 @@ impl Request {
                     <script src="{domain}/script.js"></script>
                     <h2>Image headers <small>({domain}/image.png)</small></h2>
                     <img src="{domain}/image.png"></img>
-                    <h2>Iframe headers <small>({domain}/iframe.html)</small></h2>
-                    <iframe src="{domain}/iframe.html"></iframe>
+                    {iframe_embed}
                 </body>
             </html>"#,
             host = self.get(Header::Host, Escape::Html),
@@ -248,30 +258,30 @@ impl Request {
         response
     }
 
-    fn html(&self) -> Response {
+    fn png(&self) -> Response {
+        // TODO: multiline text with imageproc?
+        // https://github.com/RookAndPawn/text-to-png/issues/3
         let response = format!(
-            r#"
-                #css-cookie::after {{
-                    content: '{cookie:?}';
-                }}
-                #css-pp::after {{
-                    content: '{permission_policy:?}';
-                }}
-                #css-sah::after {{
-                    content: '{sec_fetch_storage_access:?}';
-                }}
-            "#,
-            cookie = self.cookie.as_ref().map(|s| s.replace('\'', "\\'")),
-            permission_policy = self
-                .permission_policy
-                .as_ref()
-                .map(|s| s.replace('\'', "\\'")),
-            sec_fetch_storage_access = self
-                .sec_fetch_storage_access
-                .as_ref()
-                .map(|s| s.replace('\'', "\\'")),
+            "\
+                Host: {host}, \
+                Origin: {origin}, \
+                Referer: {referer}, \
+                Cookie: {cookie}, \
+                Permission-Policy: {permission_policy}, \
+                Sec-Fetch-Storage-Access: {sec_fetch_storage_access}\
+            ",
+            host = self.get(Header::Host, Escape::None),
+            origin = self.get(Header::Origin, Escape::None),
+            referer = self.get(Header::Referer, Escape::None),
+            cookie = self.get(Header::Cookie, Escape::None),
+            permission_policy = self.get(Header::PermissionPolicy, Escape::None),
+            sec_fetch_storage_access = self.get(Header::SecFetchStorageAccess, Escape::None),
         );
-        warp::reply::with_header(response, "content-type", "text/css").into_response()
+        let renderer = TextRenderer::default();
+        let text_png = renderer
+            .render_text_to_png_data(response, 16, "#000000")
+            .unwrap();
+        warp::reply::with_header(text_png.data, "content-type", "image/png").into_response()
     }
 
     pub fn respond(&self, endpoint: Tail) -> Response {
@@ -285,11 +295,12 @@ impl Request {
         };
 
         match endpoint {
-            "" => self.main(),
+            "" => self.main(false),
             "style.css" => self.css(),
             "script.js" => self.js(),
             "fetch.json" => self.json(),
-            //"iframe.html" => self.html(),
+            "image.png" => self.png(),
+            "iframe.html" => self.main(true),
             _ => reply::with_status(format!("Not found! {endpoint:?}"), StatusCode::NOT_FOUND)
                 .into_response(),
         }

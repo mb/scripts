@@ -20,6 +20,7 @@
 
 use cookie::Cookie;
 use text_to_png::TextRenderer;
+use url::Url;
 use uuid::Uuid;
 use warp::{
     Filter,
@@ -90,12 +91,36 @@ impl Request {
 }
 
 impl Request {
+    fn style(&self) -> String {
+        let background_color = if let Some(host) = self.host.as_ref() {
+            match host.as_str() {
+                "sah.yet.wiki" => "99c1f1",
+                "sah.yet.cx" => "f9f06b",
+                "sah.neon.rocks" => "f66151",
+                _ => "ffffff",
+            }
+        } else {
+            "ffffff"
+        };
+        format!(
+            "<style>
+                body {{
+                    background-color: {background_color};
+                }}
+                p {{
+                    margin: 0;
+                }}
+            </style>"
+        )
+    }
     // simulate SSO auth flow with user interaction
     fn auth(&self) -> Response {
+        let style = self.style();
         let response = format!(
             r#"<!DOCTYPE html>
             <html>
                 <head><title>Storage-Access-API test ground</title></head>
+                {style}
                 <body>
                     <h1>Storage-Access-API test ground</h1>
                     If a header doesn't exist, null will be displayed. If it has a value, an additional round of quotes (&quot;) will be displayed.<br>
@@ -156,7 +181,7 @@ impl Request {
                 .body(Body::empty())
                 .unwrap()
         } else {
-            let id = uuid::Uuid::new_v4();
+            let id = uuid::Uuid::now_v7();
             warp::http::Response::builder()
                 .header(
                     "Location",
@@ -173,6 +198,7 @@ impl Request {
 impl Request {
     fn main(&self, iframe: bool) -> Response {
         let domain = "https://sah.neon.rocks/storage-access";
+        let style = self.style();
         let iframe_embed = if !iframe {
             format!(
                 r#"
@@ -188,6 +214,7 @@ impl Request {
             <html>
                 <head><title>Storage-Access-API test ground</title></head>
                 <body>
+                    {style}
                     <h1>Storage-Access-API test ground</h1>
                     If a header doesn't exist, null will be displayed. If it has a value, an additional round of quotes (&quot;) will be displayed.<br>
                     Links to set unpartitioned storage on the third party domain:
@@ -368,7 +395,39 @@ impl Request {
         warp::reply::with_header(text_png.data, "content-type", "image/png").into_response()
     }
 
+    /// store id from query parameter in cookie and redirect to url without query param
+    fn store_id(&self, endpoint: &Tail) -> Option<Response> {
+        /*
+        let host = self.host.as_ref()?;
+        let url = format!("https://{host}/storage-access/{}", endpoint.as_str());
+        let url = Url::parse(&url).ok()?;
+        let mut id = None;
+        // find id parameter
+        for (name, value) in url.query_pairs() {
+            if name == "id" {
+                id = Some(value);
+                break;
+            }
+        }
+        if let Some(id) = id {
+            let mut out_params = url_out.as_mut().map(|url| {
+                let mut out_params = url.query_pairs_mut();
+                out_params.clear();
+                out_params
+            });
+
+
+        } else {
+            None
+        }
+        */
+        None
+    }
+
     pub fn respond(&self, endpoint: Tail) -> Response {
+        if let Some(response) = self.store_id(&endpoint) {
+            return response;
+        }
         let (endpoint, query) = if let Some((endpoint, data)) =
             endpoint.as_str().split_once(|c| c == '/' || c == '?')
         {

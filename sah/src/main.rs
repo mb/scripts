@@ -33,7 +33,6 @@ use warp::{
 struct Request {
     host: Option<String>,
     cookie: Option<String>,
-    permission_policy: Option<String>,
     referer: Option<String>,
     origin: Option<String>,
     sec_fetch_storage_access: Option<String>,
@@ -42,7 +41,6 @@ struct Request {
 enum Header {
     Host,
     Cookie,
-    PermissionPolicy,
     Referer,
     Origin,
     SecFetchStorageAccess,
@@ -60,7 +58,6 @@ impl Request {
         let header = match header {
             Header::Host => self.host.as_ref(),
             Header::Cookie => self.cookie.as_ref(),
-            Header::PermissionPolicy => self.permission_policy.as_ref(),
             Header::Referer => self.referer.as_ref(),
             Header::Origin => self.origin.as_ref(),
             Header::SecFetchStorageAccess => self.sec_fetch_storage_access.as_ref(),
@@ -138,7 +135,6 @@ impl Request {
                     <p>Origin: <span class="origin">{origin}</span></p>
                     <p>Referer: <span class="referer">{referer}</span></p>
                     <p>Cookie: <span class="cookie">{cookie}</span></p>
-                    <p>Permission-Policy: <span class="pp">{permission_policy}</span></p>
                     <p>Sec-Fetch-Storage-Access: <span class="sah">{sec_fetch_storage_access}</span></p>
                 </body>
             </html>"#,
@@ -146,7 +142,6 @@ impl Request {
             origin = self.get(Header::Origin, Escape::Html),
             referer = self.get(Header::Referer, Escape::Html),
             cookie = self.get(Header::Cookie, Escape::Html),
-            permission_policy = self.get(Header::PermissionPolicy, Escape::Html),
             sec_fetch_storage_access = self.get(Header::SecFetchStorageAccess, Escape::Html),
         );
         warp::reply::html(response).into_response()
@@ -227,21 +222,18 @@ impl Request {
                     <p>Origin: <span class="origin">{origin}</span></p>
                     <p>Referer: <span class="referer">{referer}</span></p>
                     <p>Cookie: <span class="cookie">{cookie}</span></p>
-                    <p>Permission-Policy: <span class="pp">{permission_policy}</span></p>
                     <p>Sec-Fetch-Storage-Access: <span class="sah">{sec_fetch_storage_access}</span></p>
                     <h2>Fetch headers <small>({domain}/fetch.json)</small></h2>
                     <p>Host: <span id="fetch-host" class="host"></span></p>
                     <p>Origin: <span id="fetch-origin" class="origin"></span></p>
                     <p>Referer: <span id="fetch-referer" class="referer"></span></p>
                     <p>Cookie: <span id="fetch-cookie" class="cookie"></span></p>
-                    <p>Permission-Policy: <span id="fetch-pp" class="pp"></span></p>
                     <p>Sec-Fetch-Storage-Access: <span id="fetch-sah" class="sah"></span></p>
                     <script>
                         let host = document.getElementById("fetch-host");
                         let origin = document.getElementById("fetch-origin");
                         let referer = document.getElementById("fetch-referer");
                         let cookie = document.getElementById("fetch-cookie");
-                        let pp = document.getElementById("fetch-pp");
                         let sah = document.getElementById("fetch-sah");
                         fetch("{domain}/fetch.json")
                             .then((response) => response.json())
@@ -250,7 +242,6 @@ impl Request {
                                 origin.innerText = response.origin;
                                 referer.innerText = response.referer;
                                 cookie.innerText = response.cookie;
-                                pp.innerText = response.permission_policy;
                                 sah.innerText = response.sec_fetch_storage_access;
                             }});
                     </script>
@@ -260,14 +251,12 @@ impl Request {
                     <p>Origin: <span id="css-origin" class="origin"></span></p>
                     <p>Referer: <span id="css-referer" class="referer"></span></p>
                     <p>Cookie: <span id="css-cookie" class="cookie"></span></p>
-                    <p>Permission-Policy: <span id="css-pp" class="pp"></span></p>
                     <p>Sec-Fetch-Storage-Access: <span id="css-sah" class="sah"></span></p>
                     <h2>Script headers <small>({domain}/script.js)</small></h2>
                     <p>Host: <span id="js-host" class="host"></span></p>
                     <p>Origin: <span id="js-origin" class="origin"></span></p>
                     <p>Referer: <span id="js-referer" class="referer"></span></p>
                     <p>Cookie: <span id="js-cookie" class="cookie"></span></p>
-                    <p>Permission-Policy: <span id="js-pp" class="pp"></span></p>
                     <p>Sec-Fetch-Storage-Access: <span id="js-sah" class="sah"></span></p>
                     <script src="{domain}/script.js"></script>
                     <h2>Image headers <small>({domain}/image.png)</small></h2>
@@ -279,7 +268,6 @@ impl Request {
             origin = self.get(Header::Origin, Escape::Html),
             referer = self.get(Header::Referer, Escape::Html),
             cookie = self.get(Header::Cookie, Escape::Html),
-            permission_policy = self.get(Header::PermissionPolicy, Escape::Html),
             sec_fetch_storage_access = self.get(Header::SecFetchStorageAccess, Escape::Html),
         );
         warp::reply::html(response).into_response()
@@ -300,9 +288,6 @@ impl Request {
                 #css-cookie::after {{
                     content: {cookie};
                 }}
-                #css-pp::after {{
-                    content: {permission_policy};
-                }}
                 #css-sah::after {{
                     content: {sec_fetch_storage_access};
                 }}
@@ -311,7 +296,6 @@ impl Request {
             origin = self.get(Header::Origin, Escape::Css),
             referer = self.get(Header::Referer, Escape::Css),
             cookie = self.get(Header::Cookie, Escape::Css),
-            permission_policy = self.get(Header::PermissionPolicy, Escape::Css),
             sec_fetch_storage_access = self.get(Header::SecFetchStorageAccess, Escape::Css),
         );
         warp::reply::with_header(response, "content-type", "text/css").into_response()
@@ -324,14 +308,12 @@ impl Request {
                 document.getElementById("js-origin").innerText = {origin}
                 document.getElementById("js-referer").innerText = {referer}
                 document.getElementById("js-cookie").innerText = {cookie}
-                document.getElementById("js-pp").innerText = {permission_policy}
                 document.getElementById("js-sah").innerText = {sec_fetch_storage_access}
             "#,
             host = self.get(Header::Host, Escape::Css),
             origin = self.get(Header::Origin, Escape::Css),
             referer = self.get(Header::Referer, Escape::Css),
             cookie = self.get(Header::Cookie, Escape::Css),
-            permission_policy = self.get(Header::PermissionPolicy, Escape::Css),
             sec_fetch_storage_access = self.get(Header::SecFetchStorageAccess, Escape::Css),
         );
         warp::reply::with_header(response, "content-type", "text/javascript").into_response()
@@ -345,7 +327,6 @@ impl Request {
                     "origin": {origin},
                     "referer": {referer},
                     "cookie": {cookie},
-                    "permission_policy": {permission_policy},
                     "sec_fetch_storage_access": {sec_fetch_storage_access}
                 }}
             "#,
@@ -353,7 +334,6 @@ impl Request {
             origin = self.get(Header::Origin, Escape::Json),
             referer = self.get(Header::Referer, Escape::Json),
             cookie = self.get(Header::Cookie, Escape::Json),
-            permission_policy = self.get(Header::PermissionPolicy, Escape::Json),
             sec_fetch_storage_access = self.get(Header::SecFetchStorageAccess, Escape::Json),
         );
         let mut response =
@@ -378,14 +358,12 @@ impl Request {
                 Origin: {origin}, \
                 Referer: {referer}, \
                 Cookie: {cookie}, \
-                Permission-Policy: {permission_policy}, \
                 Sec-Fetch-Storage-Access: {sec_fetch_storage_access}\
             ",
             host = self.get(Header::Host, Escape::None),
             origin = self.get(Header::Origin, Escape::None),
             referer = self.get(Header::Referer, Escape::None),
             cookie = self.get(Header::Cookie, Escape::None),
-            permission_policy = self.get(Header::PermissionPolicy, Escape::None),
             sec_fetch_storage_access = self.get(Header::SecFetchStorageAccess, Escape::None),
         );
         let renderer = TextRenderer::default();
@@ -462,24 +440,15 @@ async fn main() {
         .and(warp::header::optional("origin"))
         .and(warp::header::optional("referer"))
         .and(warp::header::optional("cookie"))
-        // https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Permissions-Policy/storage-access
-        .and(warp::header::optional("permission-policy"))
         // storage-access-header request
         .and(warp::header::optional("sec-fetch-storage-access"))
         .map(
-            |endpoint,
-             host,
-             origin,
-             referer,
-             cookie,
-             permission_policy,
-             sec_fetch_storage_access| {
+            |endpoint, host, origin, referer, cookie, sec_fetch_storage_access| {
                 Request {
                     host,
                     origin,
                     referer,
                     cookie,
-                    permission_policy,
                     sec_fetch_storage_access,
                 }
                 .respond(endpoint)

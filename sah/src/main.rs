@@ -88,6 +88,18 @@ impl Request {
 }
 
 impl Request {
+    fn get_host_ident(&self) -> &'static str {
+        if let Some(host) = self.host.as_ref() {
+            match host.as_str() {
+                "sah.yet.wiki" => "wiki",
+                "sah.yet.cx" => "cx",
+                "sah.neon.rocks" => "neon",
+                _ => "none",
+            }
+        } else {
+            "none"
+        }
+    }
     fn style(&self) -> String {
         let background_color = if let Some(host) = self.host.as_ref() {
             match host.as_str() {
@@ -188,6 +200,52 @@ impl Request {
                 .unwrap()
         }
     }
+    fn table(req: &str) -> String {
+        format!(
+            r#"
+            <table>
+                <thead>
+                    <tr>
+                        <td></td>
+                        <td>neon.rocks</td>
+                        <td>yet.wiki</td>
+                        <td>yet.cx</td>
+                    </tr>
+                </thead>
+                <tr>
+                    <td>host</td>
+                    <td><span id="neon-{req}-host" class="host"></span></td>
+                    <td><span id="wiki-{req}-host" class="host"></span></td>
+                    <td><span id="cx-{req}-host" class="host"></span></td>
+                </tr>
+                <tr>
+                    <td>origin</td>
+                    <td><span id="neon-{req}-origin" class="origin"></span></td>
+                    <td><span id="wiki-{req}-origin" class="origin"></span></td>
+                    <td><span id="cx-{req}-origin" class="origin"></span></td>
+                </tr>
+                <tr>
+                    <td>referer</td>
+                    <td><span id="neon-{req}-referer" class="referer"></span></td>
+                    <td><span id="wiki-{req}-referer" class="referer"></span></td>
+                    <td><span id="cx-{req}-referer" class="referer"></span></td>
+                </tr>
+                <tr>
+                    <td>cookie</td>
+                    <td><span id="neon-{req}-cookie" class="cookie"></span></td>
+                    <td><span id="wiki-{req}-cookie" class="cookie"></span></td>
+                    <td><span id="cx-{req}-cookie" class="cookie"></span></td>
+                </tr>
+                <tr>
+                    <td>sec-fetch-storage-access</td>
+                    <td><span id="neon-{req}-sah" class="host"></span></td>
+                    <td><span id="wiki-{req}-sah" class="host"></span></td>
+                    <td><span id="cx-{req}-sah" class="host"></span></td>
+                </tr>
+            </table>
+            "#
+        )
+    }
 }
 
 impl Request {
@@ -204,6 +262,9 @@ impl Request {
         } else {
             String::new()
         };
+        let fetch = Request::table("fetch");
+        let css = Request::table("css");
+        let js = Request::table("js");
         let response = format!(
             r#"<!DOCTYPE html>
             <html>
@@ -224,43 +285,48 @@ impl Request {
                     <p>Cookie: <span class="cookie">{cookie}</span></p>
                     <p>Sec-Fetch-Storage-Access: <span class="sah">{sec_fetch_storage_access}</span></p>
                     <h2>Fetch headers <small>({domain}/fetch.json)</small></h2>
-                    <p>Host: <span id="fetch-host" class="host"></span></p>
-                    <p>Origin: <span id="fetch-origin" class="origin"></span></p>
-                    <p>Referer: <span id="fetch-referer" class="referer"></span></p>
-                    <p>Cookie: <span id="fetch-cookie" class="cookie"></span></p>
-                    <p>Sec-Fetch-Storage-Access: <span id="fetch-sah" class="sah"></span></p>
+                    {fetch}
                     <script>
-                        let host = document.getElementById("fetch-host");
-                        let origin = document.getElementById("fetch-origin");
-                        let referer = document.getElementById("fetch-referer");
-                        let cookie = document.getElementById("fetch-cookie");
-                        let sah = document.getElementById("fetch-sah");
-                        fetch("{domain}/fetch.json")
+                        let headers = ["host", "origin", "referer", "cookie", "sah"];
+                        fetch("https://sah.neon.rocks/storage-access/fetch.json")
                             .then((response) => response.json())
                             .then((response) => {{
-                                host.innerText = response.host;
-                                origin.innerText = response.origin;
-                                referer.innerText = response.referer;
-                                cookie.innerText = response.cookie;
-                                sah.innerText = response.sec_fetch_storage_access;
-                            }});
+                                for (const header in headers) {{
+                                    console.log(headers[header]);
+                                    document.getElementById("neon-fetch-"+headers[header]).innerText = response[headers[header]];
+                                }}
+                            }})
+                        fetch("https://sah.yet.wiki/storage-access/fetch.json")
+                            .then((response) => response.json())
+                            .then((response) => {{
+                                for (const header in headers) {{
+                                    console.log(headers[header]);
+                                    document.getElementById("wiki-fetch-"+headers[header]).innerText = response[headers[header]];
+                                }}
+                            }})
+                        fetch("https://sah.yet.cx/storage-access/fetch.json")
+                            .then((response) => response.json())
+                            .then((response) => {{
+                                for (const header in headers) {{
+                                    console.log(headers[header]);
+                                    document.getElementById("cx-fetch-"+headers[header]).innerText = response[headers[header]];
+                                }}
+                            }})
                     </script>
                     <h2>CSS headers <small>({domain}/style.css)</small></h2>
-                    <link href="{domain}/style.css" rel="stylesheet" />
-                    <p>Host: <span id="css-host" class="host"></span></p>
-                    <p>Origin: <span id="css-origin" class="origin"></span></p>
-                    <p>Referer: <span id="css-referer" class="referer"></span></p>
-                    <p>Cookie: <span id="css-cookie" class="cookie"></span></p>
-                    <p>Sec-Fetch-Storage-Access: <span id="css-sah" class="sah"></span></p>
+                    {css}
+                    <link href="https://sah.neon.rocks/storage-access/style.css" rel="stylesheet" />
+                    <link href="https://sah.yet.wiki/storage-access/style.css" rel="stylesheet" />
+                    <link href="https://sah.yet.cx/storage-access/style.css" rel="stylesheet" />
                     <h2>Script headers <small>({domain}/script.js)</small></h2>
-                    <p>Host: <span id="js-host" class="host"></span></p>
-                    <p>Origin: <span id="js-origin" class="origin"></span></p>
-                    <p>Referer: <span id="js-referer" class="referer"></span></p>
-                    <p>Cookie: <span id="js-cookie" class="cookie"></span></p>
-                    <p>Sec-Fetch-Storage-Access: <span id="js-sah" class="sah"></span></p>
-                    <script src="{domain}/script.js"></script>
+                    {js}
+                    <script src="https://sah.neon.rocks/storage-access/script.js"></script>
+                    <script src="https://sah.yet.wiki/storage-access/script.js"></script>
+                    <script src="https://sah.yet.cx/storage-access/script.js"></script>
                     <h2>Image headers <small>({domain}/image.png)</small></h2>
-                    <img src="{domain}/image.png"></img>
+                    <p><img src="https://sah.neon.rocks/storage-access/image.png"></img></p>
+                    <p><img src="https://sah.yet.wiki/storage-access/image.png"></img></p>
+                    <p><img src="https://sah.yet.cx/storage-access/image.png"></img></p>
                     {iframe_embed}
                 </body>
             </html>"#,
@@ -274,21 +340,22 @@ impl Request {
     }
 
     fn css(&self) -> Response {
+        let ident = self.get_host_ident();
         let response = format!(
             r#"
-                #css-host::after {{
+                #{ident}-css-host::after {{
                     content: {host};
                 }}
-                #css-origin::after {{
+                #{ident}-css-origin::after {{
                     content: {origin};
                 }}
-                #css-referer::after {{
+                #{ident}-css-referer::after {{
                     content: {referer};
                 }}
-                #css-cookie::after {{
+                #{ident}-css-cookie::after {{
                     content: {cookie};
                 }}
-                #css-sah::after {{
+                #{ident}-css-sah::after {{
                     content: {sec_fetch_storage_access};
                 }}
             "#,
@@ -302,13 +369,14 @@ impl Request {
     }
 
     fn js(&self) -> Response {
+        let ident = self.get_host_ident();
         let response = format!(
             r#"
-                document.getElementById("js-host").innerText = {host}
-                document.getElementById("js-origin").innerText = {origin}
-                document.getElementById("js-referer").innerText = {referer}
-                document.getElementById("js-cookie").innerText = {cookie}
-                document.getElementById("js-sah").innerText = {sec_fetch_storage_access}
+                document.getElementById("{ident}-js-host").innerText = {host}
+                document.getElementById("{ident}-js-origin").innerText = {origin}
+                document.getElementById("{ident}-js-referer").innerText = {referer}
+                document.getElementById("{ident}-js-cookie").innerText = {cookie}
+                document.getElementById("{ident}-js-sah").innerText = {sec_fetch_storage_access}
             "#,
             host = self.get(Header::Host, Escape::Css),
             origin = self.get(Header::Origin, Escape::Css),
@@ -327,7 +395,7 @@ impl Request {
                     "origin": {origin},
                     "referer": {referer},
                     "cookie": {cookie},
-                    "sec_fetch_storage_access": {sec_fetch_storage_access}
+                    "sah": {sec_fetch_storage_access}
                 }}
             "#,
             host = self.get(Header::Host, Escape::Json),

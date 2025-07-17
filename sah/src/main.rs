@@ -18,11 +18,14 @@
 //! * script-track -> tries to set unpartitioned state
 //! * image-track -> tries to set unpartitioned state
 
+use cookie::Cookie;
 use text_to_png::TextRenderer;
+use uuid::Uuid;
 use warp::{
     Filter,
     filters::path::Tail,
     http::StatusCode,
+    hyper::Body,
     reply::{self, Reply, Response},
 };
 
@@ -82,6 +85,87 @@ impl Request {
                     .unwrap_or("null".to_owned());
                 html_escape::encode_text(&unescaped).to_string()
             }
+        }
+    }
+}
+
+impl Request {
+    // simulate SSO auth flow with user interaction
+    fn auth(&self) -> Response {
+        let response = format!(
+            r#"<!DOCTYPE html>
+            <html>
+                <head><title>Storage-Access-API test ground</title></head>
+                <body>
+                    <h1>Storage-Access-API test ground</h1>
+                    If a header doesn't exist, null will be displayed. If it has a value, an additional round of quotes (&quot;) will be displayed.<br>
+                    Links to set unpartitioned storage on the third party domain:
+
+                    <form>
+                        <label for="username">Username:</label><br>
+                        <input type="text" id="username" name="username"><br><br>
+                        <label for="password">Password:</label><br>
+                        <input type="password" id="password" name="password"><br><br>
+                        <input type="submit" value="Submit" formaction="track">
+                    </form>
+                    <h2>Main document headers</h2>
+                    <p>Host: <span class="cookie">{host}</span></p>
+                    <p>Origin: <span class="origin">{origin}</span></p>
+                    <p>Referer: <span class="referer">{referer}</span></p>
+                    <p>Cookie: <span class="cookie">{cookie}</span></p>
+                    <p>Permission-Policy: <span class="pp">{permission_policy}</span></p>
+                    <p>Sec-Fetch-Storage-Access: <span class="sah">{sec_fetch_storage_access}</span></p>
+                </body>
+            </html>"#,
+            host = self.get(Header::Host, Escape::Html),
+            origin = self.get(Header::Origin, Escape::Html),
+            referer = self.get(Header::Referer, Escape::Html),
+            cookie = self.get(Header::Cookie, Escape::Html),
+            permission_policy = self.get(Header::PermissionPolicy, Escape::Html),
+            sec_fetch_storage_access = self.get(Header::SecFetchStorageAccess, Escape::Html),
+        );
+        warp::reply::html(response).into_response()
+    }
+    // simulate bounce tracking without user interaction
+    fn track(&self) -> Response {
+        let mut id = None;
+        // parse current id
+        if let Some(cookies) = self.cookie.as_ref() {
+            for cookie in Cookie::split_parse(cookies) {
+                if let Ok(cookie) = cookie {
+                    match cookie.name() {
+                        "id" => {
+                            if let Ok(uuid) = Uuid::parse_str(cookie.value()) {
+                                id = Some(uuid)
+                            }
+                            break;
+                        }
+                        _ => continue,
+                    }
+                }
+            }
+        }
+        // forward current id via url param and store as cookie if it didn't exist
+        if let Some(id) = id {
+            warp::http::Response::builder()
+                .header(
+                    "Location",
+                    &format!("https://sah.yet.wiki/storage-access?id={id}"),
+                )
+                .status(307)
+                .body(Body::empty())
+                .unwrap()
+        } else {
+            let id = uuid::Uuid::new_v4();
+            warp::http::Response::builder()
+                .header(
+                    "Location",
+                    &format!("https://sah.yet.wiki/storage-access?id={id}"),
+                )
+                .header("Set-Cookie", &format!("id={id}; Secure; HttpOnly"))
+                .status(307)
+                .body(Body::empty())
+                .unwrap()
         }
     }
 }
@@ -295,12 +379,16 @@ impl Request {
         };
 
         match endpoint {
+            // information
             "" => self.main(false),
             "style.css" => self.css(),
             "script.js" => self.js(),
             "fetch.json" => self.json(),
             "image.png" => self.png(),
             "iframe.html" => self.main(true),
+            // track
+            "auth" => self.auth(),
+            "track" => self.track(),
             _ => reply::with_status(format!("Not found! {endpoint:?}"), StatusCode::NOT_FOUND)
                 .into_response(),
         }

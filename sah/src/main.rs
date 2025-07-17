@@ -524,6 +524,4 @@ async fn main() {
         );
 
     warp::serve(sah).run(([127, 0, 0, 1], 3030)).await;
-
-    println!("Hello, world!");
 }

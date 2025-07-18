@@ -249,19 +249,9 @@ impl Request {
 }
 
 impl Request {
-    fn main(&self, iframe: bool) -> Response {
+    fn main(&self) -> Response {
         let domain = "https://sah.neon.rocks/storage-access";
         let style = self.style();
-        let iframe_embed = if !iframe {
-            format!(
-                r#"
-                    <h2>Iframe headers <small>({domain}/iframe.html)</small></h2>
-                    <iframe src="{domain}/iframe.html" width="100%" height="2000"></iframe>
-                "#,
-            )
-        } else {
-            String::new()
-        };
         let fetch = Request::table("fetch");
         let css = Request::table("css");
         let js = Request::table("js");
@@ -327,7 +317,24 @@ impl Request {
                     <p><img src="https://sah.neon.rocks/storage-access/image.png"></img></p>
                     <p><img src="https://sah.yet.wiki/storage-access/image.png"></img></p>
                     <p><img src="https://sah.yet.cx/storage-access/image.png"></img></p>
-                    {iframe_embed}
+                    <h2>Iframe headers</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <td></td>
+                                <td>neon.rocks</td>
+                                <td>yet.wiki</td>
+                                <td>yet.cx</td>
+                            </tr>
+                        </thead>
+                        <tr>
+                            <td>host</td>
+                            <td><a href="https://sah.neon.rocks/storage-access/iframe.html" target="subdocument">iframe</a></td>
+                            <td><a href="https://sah.yet.wiki/storage-access/iframe.html" target="subdocument">iframe</a></td>
+                            <td><a href="https://sah.yet.cx/storage-access/iframe.html" target="subdocument">iframe</a></td>
+                        </tr>
+                    </table>
+                    <iframe name="subdocument" src="about:blank" width="100%" height="2000"></iframe>
                 </body>
             </html>"#,
             host = self.get(Header::Host, Escape::Html),
@@ -485,12 +492,11 @@ impl Request {
 
         match endpoint {
             // information
-            "" => self.main(false),
+            "" | "iframe.html" => self.main(),
             "style.css" => self.css(),
             "script.js" => self.js(),
             "fetch.json" => self.json(),
             "image.png" => self.png(),
-            "iframe.html" => self.main(true),
             // track
             "auth" => self.auth(),
             "track" => self.track(),

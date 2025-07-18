@@ -12,3 +12,4 @@ text-to-png = "0.2.0"
 uuid = { version = "1.17.0", features = ["v7"] }
 cookie = "0.18.1"
 url = "2.5.4"
+indoc = "2"

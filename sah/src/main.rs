@@ -19,6 +19,7 @@
 //! * image-track -> tries to set unpartitioned state
 
 use cookie::Cookie;
+use indoc::{formatdoc, indoc};
 use text_to_png::TextRenderer;
 use url::Url;
 use uuid::Uuid;
@@ -111,7 +112,7 @@ impl Request {
         } else {
             "ffffff"
         };
-        format!(
+        formatdoc!(
             "<style>
                 body {{
                     background-color: {background_color};
@@ -125,7 +126,7 @@ impl Request {
     // simulate SSO auth flow with user interaction
     fn auth(&self) -> Response {
         let style = self.style();
-        let response = format!(
+        let response = formatdoc!(
             r#"<!DOCTYPE html>
             <html>
                 <head><title>Storage-Access-API test ground</title></head>
@@ -201,7 +202,7 @@ impl Request {
         }
     }
     fn table(req: &str) -> String {
-        format!(
+        formatdoc!(
             r#"
             <table>
                 <thead>
@@ -249,32 +250,48 @@ impl Request {
 }
 
 impl Request {
-    fn main(&self) -> Response {
-        let domain = "https://sah.neon.rocks/storage-access";
+    fn main(&self, url: &Url) -> Response {
         let style = self.style();
         let fetch = Request::table("fetch");
         let css = Request::table("css");
         let js = Request::table("js");
-        let response = format!(
-            r#"<!DOCTYPE html>
+        let response = formatdoc!(
+            r#"
+            <!DOCTYPE html>
             <html>
                 <head><title>Storage-Access-API test ground</title></head>
                 <body>
                     {style}
                     <h1>Storage-Access-API test ground</h1>
+                    Url: {url}<br>
                     If a header doesn't exist, null will be displayed. If it has a value, an additional round of quotes (&quot;) will be displayed.<br>
                     Links to set unpartitioned storage on the third party domain:
-                    <ul>
-                        <li><a href="{domain}/auth">Auth</a></li>
-                        <li><a href="{domain}/track">Track</a></li>
-                    </ul>
+                    <table>
+                        <thead>
+                            <tr>
+                                <td>neon.rocks</td>
+                                <td>yet.wiki</td>
+                                <td>yet.cx</td>
+                            </tr>
+                        </thead>
+                        <tr>
+                            <td><a href="https://sah.neon.rocks/storage-access/auth">auth</a></td>
+                            <td><a href="https://sah.yet.wiki/storage-access/auth">auth</a></td>
+                            <td><a href="https://sah.yet.cx/storage-access/auth">auth</a></td>
+                        </tr>
+                        <tr>
+                            <td><a href="https://sah.neon.rocks/storage-access/track">track</a></td>
+                            <td><a href="https://sah.yet.wiki/storage-access/track">track</a></td>
+                            <td><a href="https://sah.yet.cx/storage-access/track">track</a></td>
+                        </tr>
+                    </table>
                     <h2>Main document headers</h2>
                     <p>Host: <span class="cookie">{host}</span></p>
                     <p>Origin: <span class="origin">{origin}</span></p>
                     <p>Referer: <span class="referer">{referer}</span></p>
                     <p>Cookie: <span class="cookie">{cookie}</span></p>
                     <p>Sec-Fetch-Storage-Access: <span class="sah">{sec_fetch_storage_access}</span></p>
-                    <h2>Fetch headers <small>({domain}/fetch.json)</small></h2>
+                    <h2>Fetch headers <small>(<a href="/storage-access/fetch.json">/storage-access/fetch.json</a>)</small></h2>
                     {fetch}
                     <script>
                         let headers = ["host", "origin", "referer", "cookie", "sah"];
@@ -303,32 +320,30 @@ impl Request {
                                 }}
                             }})
                     </script>
-                    <h2>CSS headers <small>({domain}/style.css)</small></h2>
+                    <h2>CSS headers <small>(<a href="/storage-access/style.css">/storage-access/style.css</a>)</small></h2>
                     {css}
                     <link href="https://sah.neon.rocks/storage-access/style.css" rel="stylesheet" />
                     <link href="https://sah.yet.wiki/storage-access/style.css" rel="stylesheet" />
                     <link href="https://sah.yet.cx/storage-access/style.css" rel="stylesheet" />
-                    <h2>Script headers <small>({domain}/script.js)</small></h2>
+                    <h2>Script headers <small>(<a href="/storage-access/script.js">/storage-access/script.js</a>)</small></h2>
                     {js}
                     <script src="https://sah.neon.rocks/storage-access/script.js"></script>
                     <script src="https://sah.yet.wiki/storage-access/script.js"></script>
                     <script src="https://sah.yet.cx/storage-access/script.js"></script>
-                    <h2>Image headers <small>({domain}/image.png)</small></h2>
-                    <p><img src="https://sah.neon.rocks/storage-access/image.png"></img></p>
-                    <p><img src="https://sah.yet.wiki/storage-access/image.png"></img></p>
-                    <p><img src="https://sah.yet.cx/storage-access/image.png"></img></p>
+                    <h2>Image headers <small>(<a href="/storage-access/image.png">/storage-access/image.png</a>)</small></h2>
+                    <p><img src="https://sah.neon.rocks/storage-access/image.png" /></p>
+                    <p><img src="https://sah.yet.wiki/storage-access/image.png" /></p>
+                    <p><img src="https://sah.yet.cx/storage-access/image.png" /></p>
                     <h2>Iframe headers</h2>
                     <table>
                         <thead>
                             <tr>
-                                <td></td>
                                 <td>neon.rocks</td>
                                 <td>yet.wiki</td>
                                 <td>yet.cx</td>
                             </tr>
                         </thead>
                         <tr>
-                            <td>host</td>
                             <td><a href="https://sah.neon.rocks/storage-access/iframe.html" target="subdocument">iframe</a></td>
                             <td><a href="https://sah.yet.wiki/storage-access/iframe.html" target="subdocument">iframe</a></td>
                             <td><a href="https://sah.yet.cx/storage-access/iframe.html" target="subdocument">iframe</a></td>
@@ -348,7 +363,7 @@ impl Request {
 
     fn css(&self) -> Response {
         let ident = self.get_host_ident();
-        let response = format!(
+        let response = formatdoc!(
             r#"
                 #{ident}-css-host::after {{
                     content: {host};
@@ -377,7 +392,7 @@ impl Request {
 
     fn js(&self) -> Response {
         let ident = self.get_host_ident();
-        let response = format!(
+        let response = formatdoc!(
             r#"
                 document.getElementById("{ident}-js-host").innerText = {host}
                 document.getElementById("{ident}-js-origin").innerText = {origin}
@@ -395,7 +410,7 @@ impl Request {
     }
 
     fn json(&self) -> Response {
-        let response = format!(
+        let response = formatdoc!(
             r#"
                 {{
                     "host": {host},
@@ -427,7 +442,7 @@ impl Request {
     fn png(&self) -> Response {
         // TODO: multiline text with imageproc?
         // https://github.com/RookAndPawn/text-to-png/issues/3
-        let response = format!(
+        let response = formatdoc!(
             "\
                 Host: {host}, \
                 Origin: {origin}, \
@@ -478,6 +493,9 @@ impl Request {
     }
 
     pub fn respond(&self, endpoint: Tail) -> Response {
+        let host = self.host.as_ref().unwrap();
+        let url = format!("https://{host}/storage-access/{}", endpoint.as_str());
+        let url = Url::parse(&url).unwrap();
         if let Some(response) = self.store_id(&endpoint) {
             return response;
         }
@@ -492,7 +510,7 @@ impl Request {
 
         match endpoint {
             // information
-            "" | "iframe.html" => self.main(),
+            "" | "iframe.html" => self.main(&url),
             "style.css" => self.css(),
             "script.js" => self.js(),
             "fetch.json" => self.json(),

@@ -19,7 +19,8 @@
 //! * image-track -> tries to set unpartitioned state
 
 use cookie::Cookie;
-use indoc::{formatdoc, indoc};
+use indoc::formatdoc;
+use serde::Deserialize;
 use text_to_png::TextRenderer;
 use url::Url;
 use uuid::Uuid;
@@ -31,8 +32,15 @@ use warp::{
     reply::{self, Reply, Response},
 };
 
+#[derive(Deserialize)]
+struct Query {
+    id: Option<Uuid>,
+    target: Option<Url>,
+}
+
 struct Request {
     host: Option<String>,
+    query: Query,
     cookie: Option<String>,
     referer: Option<String>,
     origin: Option<String>,
@@ -125,6 +133,12 @@ impl Request {
     }
     // simulate SSO auth flow with user interaction
     fn auth(&self) -> Response {
+        let target = self
+            .query
+            .target
+            .clone()
+            .unwrap_or(Url::parse("https://example.invalid").unwrap());
+
         let style = self.style();
         let response = formatdoc!(
             r#"<!DOCTYPE html>
@@ -141,7 +155,7 @@ impl Request {
                         <input type="text" id="username" name="username"><br><br>
                         <label for="password">Password:</label><br>
                         <input type="password" id="password" name="password"><br><br>
-                        <input type="submit" value="Submit" formaction="track">
+                        <input type="submit" value="Submit" formaction="track/{target}">
                     </form>
                     <h2>Main document headers</h2>
                     <p>Host: <span class="cookie">{host}</span></p>
@@ -160,7 +174,25 @@ impl Request {
         warp::reply::html(response).into_response()
     }
     // simulate bounce tracking without user interaction
-    fn track(&self) -> Response {
+    fn track(&self, leftover: Option<&str>) -> Response {
+        let mut target = match (self.query.target.as_ref(), leftover) {
+            (Some(target), _) => target.clone(),
+            (_, Some(leftover)) => match Url::parse(leftover) {
+                Ok(url) => url,
+                Err(err) => {
+                    return reply::with_status(
+                        format!("Invalid target url given {err:?}"),
+                        StatusCode::BAD_REQUEST,
+                    )
+                    .into_response();
+                }
+            },
+            _ => {
+                return reply::with_status(format!("No target url given"), StatusCode::BAD_REQUEST)
+                    .into_response();
+            }
+        };
+
         let mut id = None;
         // parse current id
         if let Some(cookies) = self.cookie.as_ref() {
@@ -179,28 +211,16 @@ impl Request {
             }
         }
         // forward current id via url param and store as cookie if it didn't exist
-        if let Some(id) = id {
-            warp::http::Response::builder()
-                .header(
-                    "Location",
-                    &format!("https://sah.yet.wiki/storage-access?id={id}"),
-                )
-                .status(307)
-                .body(Body::empty())
-                .unwrap()
-        } else {
-            let id = uuid::Uuid::now_v7();
-            warp::http::Response::builder()
-                .header(
-                    "Location",
-                    &format!("https://sah.yet.wiki/storage-access?id={id}"),
-                )
-                .header("Set-Cookie", &format!("id={id}; Secure; HttpOnly"))
-                .status(307)
-                .body(Body::empty())
-                .unwrap()
-        }
+        let id = id.unwrap_or_else(Uuid::now_v7);
+        target.query_pairs_mut().append_pair("id", &id.to_string());
+        warp::http::Response::builder()
+            .header("Location", target.as_str())
+            .header("Set-Cookie", &format!("id={id}; Secure; HttpOnly"))
+            .status(307)
+            .body(Body::empty())
+            .unwrap()
     }
+
     fn table(req: &str) -> String {
         formatdoc!(
             r#"
@@ -255,6 +275,10 @@ impl Request {
         let fetch = Request::table("fetch");
         let css = Request::table("css");
         let js = Request::table("js");
+        let iframe_id = Uuid::new_v4();
+        let target = url::form_urlencoded::Serializer::new(String::new())
+            .append_pair("target", url.as_str())
+            .finish();
         let response = formatdoc!(
             r#"
             <!DOCTYPE html>
@@ -275,14 +299,19 @@ impl Request {
                             </tr>
                         </thead>
                         <tr>
-                            <td><a href="https://sah.neon.rocks/storage-access/auth">auth</a></td>
-                            <td><a href="https://sah.yet.wiki/storage-access/auth">auth</a></td>
-                            <td><a href="https://sah.yet.cx/storage-access/auth">auth</a></td>
+                            <td><a href="https://sah.neon.rocks/storage-access/">index</a></td>
+                            <td><a href="https://sah.yet.wiki/storage-access/">index</a></td>
+                            <td><a href="https://sah.yet.cx/storage-access/">index</a></td>
                         </tr>
                         <tr>
-                            <td><a href="https://sah.neon.rocks/storage-access/track">track</a></td>
-                            <td><a href="https://sah.yet.wiki/storage-access/track">track</a></td>
-                            <td><a href="https://sah.yet.cx/storage-access/track">track</a></td>
+                            <td><a href="https://sah.neon.rocks/storage-access/auth?{target}">auth</a></td>
+                            <td><a href="https://sah.yet.wiki/storage-access/auth?{target}">auth</a></td>
+                            <td><a href="https://sah.yet.cx/storage-access/auth?{target}">auth</a></td>
+                        </tr>
+                        <tr>
+                            <td><a href="https://sah.neon.rocks/storage-access/track?{target}">track</a></td>
+                            <td><a href="https://sah.yet.wiki/storage-access/track?{target}">track</a></td>
+                            <td><a href="https://sah.yet.cx/storage-access/track?{target}">track</a></td>
                         </tr>
                     </table>
                     <h2>Main document headers</h2>
@@ -344,12 +373,12 @@ impl Request {
                             </tr>
                         </thead>
                         <tr>
-                            <td><a href="https://sah.neon.rocks/storage-access/iframe.html" target="subdocument">iframe</a></td>
-                            <td><a href="https://sah.yet.wiki/storage-access/iframe.html" target="subdocument">iframe</a></td>
-                            <td><a href="https://sah.yet.cx/storage-access/iframe.html" target="subdocument">iframe</a></td>
+                            <td><a href="https://sah.neon.rocks/storage-access/iframe.html" target="{iframe_id}">iframe</a></td>
+                            <td><a href="https://sah.yet.wiki/storage-access/iframe.html" target="{iframe_id}">iframe</a></td>
+                            <td><a href="https://sah.yet.cx/storage-access/iframe.html" target="{iframe_id}">iframe</a></td>
                         </tr>
                     </table>
-                    <iframe name="subdocument" src="about:blank" width="100%" height="2000"></iframe>
+                    <iframe name="{iframe_id}" src="about:blank" width="100%" height="2000"></iframe>
                 </body>
             </html>"#,
             host = self.get(Header::Host, Escape::Html),
@@ -463,50 +492,17 @@ impl Request {
         warp::reply::with_header(text_png.data, "content-type", "image/png").into_response()
     }
 
-    /// store id from query parameter in cookie and redirect to url without query param
-    fn store_id(&self, endpoint: &Tail) -> Option<Response> {
-        /*
-        let host = self.host.as_ref()?;
-        let url = format!("https://{host}/storage-access/{}", endpoint.as_str());
-        let url = Url::parse(&url).ok()?;
-        let mut id = None;
-        // find id parameter
-        for (name, value) in url.query_pairs() {
-            if name == "id" {
-                id = Some(value);
-                break;
-            }
-        }
-        if let Some(id) = id {
-            let mut out_params = url_out.as_mut().map(|url| {
-                let mut out_params = url.query_pairs_mut();
-                out_params.clear();
-                out_params
-            });
-
-
-        } else {
-            None
-        }
-        */
-        None
-    }
-
     pub fn respond(&self, endpoint: Tail) -> Response {
         let host = self.host.as_ref().unwrap();
         let url = format!("https://{host}/storage-access/{}", endpoint.as_str());
         let url = Url::parse(&url).unwrap();
-        if let Some(response) = self.store_id(&endpoint) {
-            return response;
-        }
-        let (endpoint, query) = if let Some((endpoint, data)) =
-            endpoint.as_str().split_once(|c| c == '/' || c == '?')
-        {
-            (endpoint, Some(data))
-        } else {
-            // no further data in url
-            (endpoint.as_str(), None)
-        };
+        let (endpoint, leftover) =
+            if let Some((endpoint, data)) = endpoint.as_str().split_once(|c| c == '/') {
+                (endpoint, Some(data))
+            } else {
+                // no further data in url
+                (endpoint.as_str(), None)
+            };
 
         match endpoint {
             // information
@@ -517,8 +513,8 @@ impl Request {
             "image.png" => self.png(),
             // track
             "auth" => self.auth(),
-            "track" => self.track(),
-            _ => reply::with_status(format!("Not found! {endpoint:?}"), StatusCode::NOT_FOUND)
+            "track" => self.track(leftover),
+            _ => reply::with_status(format!("Not found! {url}"), StatusCode::NOT_FOUND)
                 .into_response(),
         }
     }
@@ -528,6 +524,7 @@ impl Request {
 async fn main() {
     let sah = warp::path("storage-access")
         .and(warp::path::tail())
+        .and(warp::query::query())
         .and(warp::header::optional("host"))
         .and(warp::header::optional("origin"))
         .and(warp::header::optional("referer"))
@@ -535,9 +532,10 @@ async fn main() {
         // storage-access-header request
         .and(warp::header::optional("sec-fetch-storage-access"))
         .map(
-            |endpoint, host, origin, referer, cookie, sec_fetch_storage_access| {
+            |endpoint, query, host, origin, referer, cookie, sec_fetch_storage_access| {
                 Request {
                     host,
+                    query,
                     origin,
                     referer,
                     cookie,

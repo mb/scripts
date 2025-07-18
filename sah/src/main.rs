@@ -324,27 +324,20 @@ impl Request {
                     {fetch}
                     <script>
                         let headers = ["host", "origin", "referer", "cookie", "sah"];
-                        fetch("https://sah.neon.rocks/storage-access/fetch.json")
-                            .then((response) => response.json())
-                            .then((response) => {{
-                                for (const header in headers) {{
-                                    document.getElementById("neon-fetch-"+headers[header]).innerText = response[headers[header]];
-                                }}
-                            }})
-                        fetch("https://sah.yet.wiki/storage-access/fetch.json")
-                            .then((response) => response.json())
-                            .then((response) => {{
-                                for (const header in headers) {{
-                                    document.getElementById("wiki-fetch-"+headers[header]).innerText = response[headers[header]];
-                                }}
-                            }})
-                        fetch("https://sah.yet.cx/storage-access/fetch.json")
-                            .then((response) => response.json())
-                            .then((response) => {{
-                                for (const header in headers) {{
-                                    document.getElementById("cx-fetch-"+headers[header]).innerText = response[headers[header]];
-                                }}
-                            }})
+                        let sites = {{
+                            neon: "https://sah.neon.rocks/storage-access/fetch.json",
+                            wiki: "https://sah.yet.wiki/storage-access/fetch.json",
+                            cx: "https://sah.yet.cx/storage-access/fetch.json",
+                        }}
+                        for (const [key, site] of Object.entries(sites)) {{
+                            fetch(site)
+                                .then((response) => response.json())
+                                .then((response) => {{
+                                    for (const header in headers) {{
+                                        document.getElementById(key+"-fetch-"+headers[header]).innerText = response[headers[header]];
+                                    }}
+                                }});
+                        }}
                     </script>
                     <h2>CSS headers <small>(<a href="/storage-access/style.css">/storage-access/style.css</a>)</small></h2>
                     {css}

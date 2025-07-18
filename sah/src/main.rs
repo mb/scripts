@@ -237,10 +237,10 @@ impl Request {
             <table>
                 <thead>
                     <tr>
-                        <td></td>
-                        <td>neon.rocks</td>
-                        <td>yet.wiki</td>
-                        <td>yet.cx</td>
+                        <th></td>
+                        <th>neon.rocks</td>
+                        <th>yet.wiki</td>
+                        <th>yet.cx</td>
                     </tr>
                 </thead>
                 <tr>
@@ -303,9 +303,9 @@ impl Request {
                     <table>
                         <thead>
                             <tr>
-                                <td>neon.rocks</td>
-                                <td>yet.wiki</td>
-                                <td>yet.cx</td>
+                                <th>neon.rocks</td>
+                                <th>yet.wiki</td>
+                                <th>yet.cx</td>
                             </tr>
                         </thead>
                         <tr>
@@ -367,9 +367,9 @@ impl Request {
                     <table>
                         <thead>
                             <tr>
-                                <td>neon.rocks</td>
-                                <td>yet.wiki</td>
-                                <td>yet.cx</td>
+                                <th>neon.rocks</td>
+                                <th>yet.wiki</td>
+                                <th>yet.cx</td>
                             </tr>
                         </thead>
                         <tr>

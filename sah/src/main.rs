@@ -27,7 +27,7 @@ use uuid::Uuid;
 use warp::{
     Filter,
     filters::path::Tail,
-    http::StatusCode,
+    http::{HeaderValue, StatusCode},
     hyper::Body,
     reply::{self, Reply, Response},
 };
@@ -121,12 +121,22 @@ impl Request {
             "ffffff"
         };
         formatdoc!(
-            "<style>
+            "
+            <style>
                 body {{
                     background-color: {background_color};
                 }}
                 p {{
                     margin: 0;
+                }}
+                table {{
+                    border-collapse: collapse;
+                }}
+
+                th, td {{
+                    padding: 0px;
+                    border: 1px solid #000;
+                    vertical-align: baseline;
                 }}
             </style>"
         )
@@ -320,7 +330,7 @@ impl Request {
                     <p>Referer: <span class="referer">{referer}</span></p>
                     <p>Cookie: <span class="cookie">{cookie}</span></p>
                     <p>Sec-Fetch-Storage-Access: <span class="sah">{sec_fetch_storage_access}</span></p>
-                    <h2>Fetch headers <small>(<a href="/storage-access/fetch.json">/storage-access/fetch.json</a>)</small></h2>
+                    <h2>Fetch headers <a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#including_credentials">with credentials</a><small>(<a href="/storage-access/fetch.json">/storage-access/fetch.json</a>)</small></h2>
                     {fetch}
                     <script>
                         let headers = ["host", "origin", "referer", "cookie", "sah"];
@@ -330,7 +340,7 @@ impl Request {
                             cx: "https://sah.yet.cx/storage-access/fetch.json",
                         }}
                         for (const [key, site] of Object.entries(sites)) {{
-                            fetch(site)
+                            fetch(site, {{ credentials: "include" }})
                                 .then((response) => response.json())
                                 .then((response) => {{
                                     for (const header in headers) {{
@@ -450,9 +460,12 @@ impl Request {
 
         if let Some(origin) = self.origin.as_ref() {
             if let Ok(host) = origin.parse() {
-                response
-                    .headers_mut()
-                    .append("access-control-allow-origin", host);
+                let headers = response.headers_mut();
+                headers.append("access-control-allow-origin", host);
+                headers.append(
+                    "access-control-allow-credentials",
+                    HeaderValue::from_static("true"),
+                );
             }
         }
         response

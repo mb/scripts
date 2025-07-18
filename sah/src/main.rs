@@ -328,7 +328,6 @@ impl Request {
                             .then((response) => response.json())
                             .then((response) => {{
                                 for (const header in headers) {{
-                                    console.log(headers[header]);
                                     document.getElementById("neon-fetch-"+headers[header]).innerText = response[headers[header]];
                                 }}
                             }})
@@ -336,7 +335,6 @@ impl Request {
                             .then((response) => response.json())
                             .then((response) => {{
                                 for (const header in headers) {{
-                                    console.log(headers[header]);
                                     document.getElementById("wiki-fetch-"+headers[header]).innerText = response[headers[header]];
                                 }}
                             }})
@@ -344,7 +342,6 @@ impl Request {
                             .then((response) => response.json())
                             .then((response) => {{
                                 for (const header in headers) {{
-                                    console.log(headers[header]);
                                     document.getElementById("cx-fetch-"+headers[header]).innerText = response[headers[header]];
                                 }}
                             }})

@@ -244,10 +244,10 @@ impl Request {
             <table>
                 <thead>
                     <tr>
-                        <th></td>
-                        <th class="neon">neon.rocks</td>
-                        <th class="wiki">yet.wiki</td>
-                        <th class="cx">yet.cx</td>
+                        <th></th>
+                        <th class="neon">neon.rocks</th>
+                        <th class="wiki">yet.wiki</th>
+                        <th class="cx">yet.cx</th>
                     </tr>
                 </thead>
                 <tr>
@@ -310,9 +310,9 @@ impl Request {
                     <table>
                         <thead>
                             <tr>
-                                <th class="neon">neon.rocks</td>
-                                <th class="wiki">yet.wiki</td>
-                                <th class="cx">yet.cx</td>
+                                <th class="neon">neon.rocks</th>
+                                <th class="wiki">yet.wiki</th>
+                                <th class="cx">yet.cx</th>
                             </tr>
                         </thead>
                         <tr>
@@ -337,23 +337,53 @@ impl Request {
                     <p>Referer: <span class="referer">{referer}</span></p>
                     <p>Cookie: <span class="cookie">{cookie}</span></p>
                     <p>Sec-Fetch-Storage-Access: <span class="sah">{sec_fetch_storage_access}</span></p>
+                    <script>
+                        function hasStorageAccess() {{
+                            let elem = document.getElementById("has-storage-access");
+                            elem.innerText = "";
+                            console.log('{host} document.hasStorageAccess()')
+                            document.hasStorageAccess().then((hasAccess) => {{
+                                console.log('{host} document.hasStorageAccess() => '+ hasAccess);
+                                elem.innerText = hasAccess;
+                            }});
+                        }}
+                        function requestStorageAccess() {{
+                            let elem = document.getElementById("request-storage-access");
+                            elem.innerText = "";
+                            console.log('{host} document.requestStorageAccess()')
+                            document.requestStorageAccess().then((ok) => {{
+                                console.log('{host} document.requestStorageAccess() => Ok: ' + ok);
+                                elem.innerText = "Ok: " + ok;
+                            }}).catch((err) => {{
+                                console.log('{host} document.requestStorageAccess() => Err: ' + err);
+                                elem.innerText = "Err: " + err;
+                            }});
+                        }}
+                    </script>
+                    <p><button onclick="window.hasStorageAccess();"><code>document.hasStorageAccess</code></button> <span id="has-storage-access"></span></p>
+                    <p><button onclick="window.requestStorageAccess();"><code>document.requestStorageAccess</code></button> <span id="request-storage-access"></span></p>
                     <h2>Fetch headers <a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#including_credentials">with credentials</a><small>(<a href="/storage-access/fetch.json">/storage-access/fetch.json</a>)</small></h2>
                     {fetch}
                     <script>
-                        let headers = ["host", "origin", "referer", "cookie", "sah"];
-                        let sites = {{
-                            neon: "https://sah.neon.rocks/storage-access/fetch.json",
-                            wiki: "https://sah.yet.wiki/storage-access/fetch.json",
-                            cx: "https://sah.yet.cx/storage-access/fetch.json",
-                        }}
-                        for (const [key, site] of Object.entries(sites)) {{
-                            fetch(site, {{ credentials: "include" }})
-                                .then((response) => response.json())
-                                .then((response) => {{
-                                    for (const header in headers) {{
-                                        document.getElementById(key+"-fetch-"+headers[header]).innerText = response[headers[header]];
-                                    }}
-                                }});
+                        window.onload = () => {{
+                            // fill fetch
+                            let headers = ["host", "origin", "referer", "cookie", "sah"];
+                            let sites = {{
+                                neon: "https://sah.neon.rocks/storage-access/fetch.json",
+                                wiki: "https://sah.yet.wiki/storage-access/fetch.json",
+                                cx: "https://sah.yet.cx/storage-access/fetch.json",
+                            }}
+                            for (const [key, site] of Object.entries(sites)) {{
+                                fetch(site, {{ credentials: "include" }})
+                                    .then((response) => response.json())
+                                    .then((response) => {{
+                                        for (const header in headers) {{
+                                            document.getElementById(key+"-fetch-"+headers[header]).innerText = response[headers[header]];
+                                        }}
+                                    }});
+                            }}
+                            // also fill has-storage-access
+                            hasStorageAccess();
                         }}
                     </script>
                     <h2>CSS headers <small>(<a href="/storage-access/style.css">/storage-access/style.css</a>)</small></h2>
@@ -374,9 +404,9 @@ impl Request {
                     <table>
                         <thead>
                             <tr>
-                                <th class="neon">neon.rocks</td>
-                                <th class="wiki">yet.wiki</td>
-                                <th class="cx">yet.cx</td>
+                                <th class="neon">neon.rocks</th>
+                                <th class="wiki">yet.wiki</th>
+                                <th class="cx">yet.cx</th>
                             </tr>
                         </thead>
                         <tr>

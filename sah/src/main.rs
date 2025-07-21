@@ -110,11 +110,15 @@ impl Request {
         }
     }
     fn style(&self) -> String {
+        let wiki = "#dfeeff";
+        let cx = "#acab9d";
+        let neon = "#ffc3bc";
+
         let background_color = if let Some(host) = self.host.as_ref() {
             match host.as_str() {
-                "sah.yet.wiki" => "99c1f1",
-                "sah.yet.cx" => "f9f06b",
-                "sah.neon.rocks" => "f66151",
+                "sah.yet.wiki" => wiki,
+                "sah.yet.cx" => cx,
+                "sah.neon.rocks" => neon,
                 _ => "ffffff",
             }
         } else {
@@ -126,6 +130,9 @@ impl Request {
                 body {{
                     background-color: {background_color};
                 }}
+                .wiki {{ background-color: {wiki}; }}
+                .cx {{ background-color: {cx}; }}
+                .neon {{ background-color: {neon}; }}
                 p {{
                     margin: 0;
                 }}
@@ -238,40 +245,40 @@ impl Request {
                 <thead>
                     <tr>
                         <th></td>
-                        <th>neon.rocks</td>
-                        <th>yet.wiki</td>
-                        <th>yet.cx</td>
+                        <th class="neon">neon.rocks</td>
+                        <th class="wiki">yet.wiki</td>
+                        <th class="cx">yet.cx</td>
                     </tr>
                 </thead>
                 <tr>
                     <td>host</td>
-                    <td><span id="neon-{req}-host" class="host"></span></td>
-                    <td><span id="wiki-{req}-host" class="host"></span></td>
-                    <td><span id="cx-{req}-host" class="host"></span></td>
+                    <td><span id="neon-{req}-host" class="neon host"></span></td>
+                    <td><span id="wiki-{req}-host" class="wiki host"></span></td>
+                    <td><span id="cx-{req}-host" class="cx host"></span></td>
                 </tr>
                 <tr>
                     <td>origin</td>
-                    <td><span id="neon-{req}-origin" class="origin"></span></td>
-                    <td><span id="wiki-{req}-origin" class="origin"></span></td>
-                    <td><span id="cx-{req}-origin" class="origin"></span></td>
+                    <td><span id="neon-{req}-origin" class="neon origin"></span></td>
+                    <td><span id="wiki-{req}-origin" class="wiki origin"></span></td>
+                    <td><span id="cx-{req}-origin" class="cx origin"></span></td>
                 </tr>
                 <tr>
                     <td>referer</td>
-                    <td><span id="neon-{req}-referer" class="referer"></span></td>
-                    <td><span id="wiki-{req}-referer" class="referer"></span></td>
-                    <td><span id="cx-{req}-referer" class="referer"></span></td>
+                    <td><span id="neon-{req}-referer" class="neon referer"></span></td>
+                    <td><span id="wiki-{req}-referer" class="wiki referer"></span></td>
+                    <td><span id="cx-{req}-referer" class="cx referer"></span></td>
                 </tr>
                 <tr>
                     <td>cookie</td>
-                    <td><span id="neon-{req}-cookie" class="cookie"></span></td>
-                    <td><span id="wiki-{req}-cookie" class="cookie"></span></td>
-                    <td><span id="cx-{req}-cookie" class="cookie"></span></td>
+                    <td><span id="neon-{req}-cookie" class="neon cookie"></span></td>
+                    <td><span id="wiki-{req}-cookie" class="wiki cookie"></span></td>
+                    <td><span id="cx-{req}-cookie" class="cx cookie"></span></td>
                 </tr>
                 <tr>
                     <td>sec-fetch-storage-access</td>
-                    <td><span id="neon-{req}-sah" class="host"></span></td>
-                    <td><span id="wiki-{req}-sah" class="host"></span></td>
-                    <td><span id="cx-{req}-sah" class="host"></span></td>
+                    <td><span id="neon-{req}-sah" class="neon host"></span></td>
+                    <td><span id="wiki-{req}-sah" class="wiki host"></span></td>
+                    <td><span id="cx-{req}-sah" class="cx host"></span></td>
                 </tr>
             </table>
             "#
@@ -303,25 +310,25 @@ impl Request {
                     <table>
                         <thead>
                             <tr>
-                                <th>neon.rocks</td>
-                                <th>yet.wiki</td>
-                                <th>yet.cx</td>
+                                <th class="neon">neon.rocks</td>
+                                <th class="wiki">yet.wiki</td>
+                                <th class="cx">yet.cx</td>
                             </tr>
                         </thead>
                         <tr>
-                            <td><a href="https://sah.neon.rocks/storage-access/">index</a></td>
-                            <td><a href="https://sah.yet.wiki/storage-access/">index</a></td>
-                            <td><a href="https://sah.yet.cx/storage-access/">index</a></td>
+                            <td class="neon"><a href="https://sah.neon.rocks/storage-access/">index</a></td>
+                            <td class="wiki"><a href="https://sah.yet.wiki/storage-access/">index</a></td>
+                            <td class="cx"><a href="https://sah.yet.cx/storage-access/">index</a></td>
                         </tr>
                         <tr>
-                            <td><a href="https://sah.neon.rocks/storage-access/auth?{target}">auth</a></td>
-                            <td><a href="https://sah.yet.wiki/storage-access/auth?{target}">auth</a></td>
-                            <td><a href="https://sah.yet.cx/storage-access/auth?{target}">auth</a></td>
+                            <td class="neon"><a href="https://sah.neon.rocks/storage-access/auth?{target}">auth</a></td>
+                            <td class="wiki"><a href="https://sah.yet.wiki/storage-access/auth?{target}">auth</a></td>
+                            <td class="cx"><a href="https://sah.yet.cx/storage-access/auth?{target}">auth</a></td>
                         </tr>
                         <tr>
-                            <td><a href="https://sah.neon.rocks/storage-access/track?{target}">track</a></td>
-                            <td><a href="https://sah.yet.wiki/storage-access/track?{target}">track</a></td>
-                            <td><a href="https://sah.yet.cx/storage-access/track?{target}">track</a></td>
+                            <td class="neon"><a href="https://sah.neon.rocks/storage-access/track?{target}">track</a></td>
+                            <td class="wiki"><a href="https://sah.yet.wiki/storage-access/track?{target}">track</a></td>
+                            <td class="cx"><a href="https://sah.yet.cx/storage-access/track?{target}">track</a></td>
                         </tr>
                     </table>
                     <h2>Main document headers</h2>
@@ -367,15 +374,15 @@ impl Request {
                     <table>
                         <thead>
                             <tr>
-                                <th>neon.rocks</td>
-                                <th>yet.wiki</td>
-                                <th>yet.cx</td>
+                                <th class="neon">neon.rocks</td>
+                                <th class="wiki">yet.wiki</td>
+                                <th class="cx">yet.cx</td>
                             </tr>
                         </thead>
                         <tr>
-                            <td><a href="https://sah.neon.rocks/storage-access/iframe.html" target="{iframe_id}">iframe</a></td>
-                            <td><a href="https://sah.yet.wiki/storage-access/iframe.html" target="{iframe_id}">iframe</a></td>
-                            <td><a href="https://sah.yet.cx/storage-access/iframe.html" target="{iframe_id}">iframe</a></td>
+                            <td class="neon"><a href="https://sah.neon.rocks/storage-access/iframe.html" target="{iframe_id}">iframe</a></td>
+                            <td class="wiki"><a href="https://sah.yet.wiki/storage-access/iframe.html" target="{iframe_id}">iframe</a></td>
+                            <td class="cx"><a href="https://sah.yet.cx/storage-access/iframe.html" target="{iframe_id}">iframe</a></td>
                         </tr>
                     </table>
                     <iframe name="{iframe_id}" src="about:blank" width="100%" height="2000"></iframe>

@@ -111,7 +111,7 @@ impl Request {
     }
     fn style(&self) -> String {
         let wiki = "#dfeeff";
-        let cx = "#acab9d";
+        let cx = "#babe91";
         let neon = "#ffc3bc";
 
         let background_color = if let Some(host) = self.host.as_ref() {

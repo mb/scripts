@@ -12,13 +12,11 @@ fn is_advanced(s: &str) -> Option<i32> {
         "v" => 0,
         "o" => 1,
         "f" => 2,
+        "j" => 3,
         _ => return None,
     };
-    if head != "v" && head != "o" && head != "f" {
-        return None;
-    }
     let i = tail.parse::<i32>().ok()?;
-    i.checked_mul(3)?.checked_add(add)
+    i.checked_mul(4)?.checked_add(add)
 }
 
 fn presort_fields(field: &str) -> i32 {
@@ -28,6 +26,7 @@ fn presort_fields(field: &str) -> i32 {
         "status" => 3,
         "resolution" => 4,
         "query_format" => 2000,
+        "j_top" => 2001,
         _ => 1000,
     }
 }

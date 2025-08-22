@@ -273,6 +273,34 @@ impl Request {
             .body(Body::empty())
             .unwrap()
     }
+    // clear cookies and redirect back
+    fn clear(&self, leftover: Option<&str>) -> Response {
+        let target = match (self.query.target.as_ref(), leftover) {
+            (Some(target), _) => target.clone(),
+            (_, Some(leftover)) => match Url::parse(leftover) {
+                Ok(url) => url,
+                Err(err) => {
+                    return reply::with_status(
+                        format!("Invalid target url given {err:?}"),
+                        StatusCode::BAD_REQUEST,
+                    )
+                    .into_response();
+                }
+            },
+            _ => {
+                return reply::with_status(format!("No target url given"), StatusCode::BAD_REQUEST)
+                    .into_response();
+            }
+        };
+
+        // forward current id via url param and send clear-site-data: cookie header
+        warp::http::Response::builder()
+            .header("Location", target.as_str())
+            .header("Clear-Site-Data", r#""cookies""#)
+            .status(307)
+            .body(Body::empty())
+            .unwrap()
+    }
 
     fn table(req: &str) -> String {
         formatdoc!(
@@ -341,7 +369,7 @@ impl Request {
                     <td><span id="cx-{req}-sah" class="cx host"></span></td>
                 </tr>
             </table>
-            "#
+            "#,
         )
     }
 }
@@ -459,6 +487,11 @@ impl Request {
                             <td class="neon"><a href="https://sah.neon.rocks/storage-access/track?{target}">track</a></td>
                             <td class="wiki"><a href="https://sah.yet.wiki/storage-access/track?{target}">track</a></td>
                             <td class="cx"><a href="https://sah.yet.cx/storage-access/track?{target}">track</a></td>
+                        </tr>
+                        <tr>
+                            <td class="neon"><a href="https://sah.neon.rocks/storage-access/clear?{target}">clear</a></td>
+                            <td class="wiki"><a href="https://sah.yet.wiki/storage-access/clear?{target}">clear</a></td>
+                            <td class="cx"><a href="https://sah.yet.cx/storage-access/clear?{target}">clear</a></td>
                         </tr>
                     </table>
                     <h2>Main document headers</h2>
@@ -726,6 +759,7 @@ impl Request {
             // track
             "auth" => self.auth(),
             "track" => self.track(leftover),
+            "clear" => self.clear(leftover),
             _ => reply::with_status(format!("Not found! {url}"), StatusCode::NOT_FOUND)
                 .into_response(),
         }

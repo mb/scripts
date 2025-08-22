@@ -679,8 +679,6 @@ impl Request {
     }
 
     fn png(&self) -> Response {
-        // TODO: multiline text with imageproc?
-        // https://github.com/RookAndPawn/text-to-png/issues/3
         let response = formatdoc!(
             "\
                 Host: {host}

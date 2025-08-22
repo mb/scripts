@@ -481,7 +481,7 @@ impl Request {
                     </script>
                     <p><button onclick="window.hasStorageAccess();"><code>document.hasStorageAccess</code></button> <span id="has-storage-access"></span></p>
                     <p><button onclick="window.requestStorageAccess();"><code>document.requestStorageAccess</code></button> <span id="request-storage-access"></span></p>
-                    <h2>Fetch headers <a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#including_credentials">with credentials</a><small>(<a href="/storage-access/fetch.json">/storage-access/fetch.json</a>)</small></h2>
+                    <h2>Fetch headers <a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#including_credentials">with credentials</a><small> (<a href="/storage-access/fetch.json">/storage-access/fetch.json</a>)</small></h2>
                     {fetch}
                     <script>
                         window.onload = () => {{

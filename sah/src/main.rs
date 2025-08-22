@@ -19,9 +19,9 @@
 //! * image-track -> tries to set unpartitioned state
 
 use cookie::Cookie;
+use image::Rgba;
 use indoc::formatdoc;
 use serde::Deserialize;
-use text_to_png::TextRenderer;
 use url::Url;
 use uuid::Uuid;
 use warp::{
@@ -31,6 +31,8 @@ use warp::{
     reply::{self, Reply, Response},
     Filter,
 };
+
+mod to_png;
 
 #[derive(Deserialize)]
 struct Query {
@@ -122,6 +124,19 @@ impl Request {
             "none"
         }
     }
+    fn bg_color(&self) -> Rgba<u8> {
+        if let Some(host) = self.host.as_ref() {
+            match host.as_str() {
+                "sah.yet.wiki" => Rgba([0xdf, 0xee, 0xff, 0xff]),
+                "sah.yet.cx" => Rgba([0xba, 0xbe, 0x91, 0xff]),
+                "sah.neon.rocks" => Rgba([0xff, 0xc3, 0xbc, 0xff]),
+                _ => Rgba([0xff, 0xff, 0xff, 0xff]),
+            }
+        } else {
+            Rgba([0xff, 0xff, 0xff, 0xff])
+        }
+    }
+
     fn style(&self) -> String {
         let wiki = "#dfeeff";
         let cx = "#babe91";
@@ -516,9 +531,9 @@ impl Request {
                     <script src="https://sah.yet.wiki/storage-access/script.js"></script>
                     <script src="https://sah.yet.cx/storage-access/script.js"></script>
                     <h2>Image headers <small>(<a href="/storage-access/image.png">/storage-access/image.png</a>)</small></h2>
-                    <p><img src="https://sah.neon.rocks/storage-access/image.png" /></p>
-                    <p><img src="https://sah.yet.wiki/storage-access/image.png" /></p>
-                    <p><img src="https://sah.yet.cx/storage-access/image.png" /></p>
+                    <img src="https://sah.neon.rocks/storage-access/image.png" />
+                    <img src="https://sah.yet.wiki/storage-access/image.png" />
+                    <img src="https://sah.yet.cx/storage-access/image.png" />
                     <h2>Iframe headers</h2>
                     <table>
                         <thead>
@@ -668,16 +683,15 @@ impl Request {
         // https://github.com/RookAndPawn/text-to-png/issues/3
         let response = formatdoc!(
             "\
-                Host: {host}, \
-                Origin: {origin}, \
-                Referer: {referer}, \
-                Cookie: {cookie}, \
-                Sec-Fetch-Dest: {sec_fetch_dest}, \
-                Sec-Fetch-Mode: {sec_fetch_mode}, \
-                Sec-Fetch-Site: {sec_fetch_site}, \
-                Sec-Fetch-User: {sec_fetch_user}, \
-                Sec-Fetch-Storage-Access: {sec_fetch_storage_access}\
-            ",
+                Host: {host}
+                Origin: {origin}
+                Referer: {referer}
+                Cookie: {cookie}
+                Sec-Fetch-Dest: {sec_fetch_dest}
+                Sec-Fetch-Mode: {sec_fetch_mode}
+                Sec-Fetch-Site: {sec_fetch_site}
+                Sec-Fetch-User: {sec_fetch_user}
+                Sec-Fetch-Storage-Access: {sec_fetch_storage_access}",
             host = self.get(Header::Host, Escape::None),
             origin = self.get(Header::Origin, Escape::None),
             referer = self.get(Header::Referer, Escape::None),
@@ -688,11 +702,8 @@ impl Request {
             sec_fetch_user = self.get(Header::SecFetchUser, Escape::None),
             sec_fetch_storage_access = self.get(Header::SecFetchStorageAccess, Escape::None),
         );
-        let renderer = TextRenderer::default();
-        let text_png = renderer
-            .render_text_to_png_data(response, 16, "#000000")
-            .unwrap();
-        warp::reply::with_header(text_png.data, "content-type", "image/png").into_response()
+        let img = to_png::png_with_bg(&response, self.bg_color());
+        warp::reply::with_header(img, "content-type", "image/png").into_response()
     }
 
     pub fn respond(&self, endpoint: Tail) -> Response {

@@ -344,15 +344,44 @@ impl Request {
                 <head><title>Storage-Access-API test ground</title></head>
                 <body>
                     <script>
+                        // update URL
                         function updateUrl(iframe) {{
                             let url = "{url}?iframe=" + iframe;
                             window.history.pushState({{ path: url }}, "", url);
                             if (window.parent !== window) {{
-                                window.parent.postMessage("{own_ident}," + iframe, "*");
+                                window.parent.postMessage({{ type: "nav", url: "{own_ident}," + iframe }}, "*");
                             }}
                         }}
+
+                        // update frame size
+                        function sendHeightToParent() {{
+                            const height = document.body.scrollHeight;
+
+                            if (window.parent !== window) {{
+                                window.parent.postMessage(
+                                    {{ type: "size", height: height }},
+                                    '*'
+                                );
+                            }}
+                        }}
+                        window.addEventListener("load", sendHeightToParent);
+                        window.addEventListener("resize", sendHeightToParent);
+
+                        // propagate
                         window.addEventListener("message", (e) => {{
-                            updateUrl(e.data);
+                            switch (e.data.type) {{
+                                case "nav":
+                                    updateUrl(e.data.url);
+                                    break;
+                                case "size":
+                                    const iframe = document.querySelector("iframe");
+                                    if (iframe) {{
+                                        iframe.style.height = e.data.height + 50 + 'px';
+                                        console.log("update height to " + e.data.height + 50);
+                                        sendHeightToParent();
+                                    }}
+                                    break;
+                            }}
                         }})
                     </script>
                     {style}
@@ -469,7 +498,7 @@ impl Request {
                             <td class="cx"><a onclick="return updateUrl('cx');" href="https://sah.yet.cx/storage-access/iframe.html" target="{iframe_id}">iframe</a></td>
                         </tr>
                     </table>
-                    <iframe name="{iframe_id}" src="{iframe_url}" width="100%" height="2000"></iframe>
+                    <iframe name="{iframe_id}" src="{iframe_url}" width="100%" height="100"></iframe>
                 </body>
             </html>"#,
             host = self.get(Header::Host, Escape::Html),

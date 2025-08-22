@@ -44,6 +44,7 @@ struct Request {
     cookie: Option<String>,
     referer: Option<String>,
     origin: Option<String>,
+    sec_fetch_site: Option<String>,
     sec_fetch_storage_access: Option<String>,
 }
 
@@ -52,6 +53,7 @@ enum Header {
     Cookie,
     Referer,
     Origin,
+    SecFetchSite,
     SecFetchStorageAccess,
 }
 
@@ -69,6 +71,7 @@ impl Request {
             Header::Cookie => self.cookie.as_ref(),
             Header::Referer => self.referer.as_ref(),
             Header::Origin => self.origin.as_ref(),
+            Header::SecFetchSite => self.sec_fetch_site.as_ref(),
             Header::SecFetchStorageAccess => self.sec_fetch_storage_access.as_ref(),
         };
         match escape {
@@ -179,6 +182,7 @@ impl Request {
                     <p>Origin: <span class="origin">{origin}</span></p>
                     <p>Referer: <span class="referer">{referer}</span></p>
                     <p>Cookie: <span class="cookie">{cookie}</span></p>
+                    <p>Sec-Fetch-Site: <span class="sah">{sec_fetch_site}</span></p>
                     <p>Sec-Fetch-Storage-Access: <span class="sah">{sec_fetch_storage_access}</span></p>
                 </body>
             </html>"#,
@@ -186,6 +190,7 @@ impl Request {
             origin = self.get(Header::Origin, Escape::Html),
             referer = self.get(Header::Referer, Escape::Html),
             cookie = self.get(Header::Cookie, Escape::Html),
+            sec_fetch_site = self.get(Header::SecFetchSite, Escape::Html),
             sec_fetch_storage_access = self.get(Header::SecFetchStorageAccess, Escape::Html),
         );
         warp::reply::html(response).into_response()
@@ -275,6 +280,12 @@ impl Request {
                     <td><span id="cx-{req}-cookie" class="cx cookie"></span></td>
                 </tr>
                 <tr>
+                    <td>sec-fetch-site</td>
+                    <td><span id="neon-{req}-sfs" class="neon host"></span></td>
+                    <td><span id="wiki-{req}-sfs" class="wiki host"></span></td>
+                    <td><span id="cx-{req}-sfs" class="cx host"></span></td>
+                </tr>
+                <tr>
                     <td>sec-fetch-storage-access</td>
                     <td><span id="neon-{req}-sah" class="neon host"></span></td>
                     <td><span id="wiki-{req}-sah" class="wiki host"></span></td>
@@ -336,6 +347,7 @@ impl Request {
                     <p>Origin: <span class="origin">{origin}</span></p>
                     <p>Referer: <span class="referer">{referer}</span></p>
                     <p>Cookie: <span class="cookie">{cookie}</span></p>
+                    <p>Sec-Fetch-Site: <span class="sah">{sec_fetch_site}</span></p>
                     <p>Sec-Fetch-Storage-Access: <span class="sah">{sec_fetch_storage_access}</span></p>
                     <script>
                         function hasStorageAccess() {{
@@ -367,7 +379,7 @@ impl Request {
                     <script>
                         window.onload = () => {{
                             // fill fetch
-                            let headers = ["host", "origin", "referer", "cookie", "sah"];
+                            let headers = ["host", "origin", "referer", "cookie", "sfs", "sah"];
                             let sites = {{
                                 neon: "https://sah.neon.rocks/storage-access/fetch.json",
                                 wiki: "https://sah.yet.wiki/storage-access/fetch.json",
@@ -422,6 +434,7 @@ impl Request {
             origin = self.get(Header::Origin, Escape::Html),
             referer = self.get(Header::Referer, Escape::Html),
             cookie = self.get(Header::Cookie, Escape::Html),
+            sec_fetch_site = self.get(Header::SecFetchSite, Escape::Html),
             sec_fetch_storage_access = self.get(Header::SecFetchStorageAccess, Escape::Html),
         );
         warp::reply::html(response).into_response()
@@ -443,6 +456,9 @@ impl Request {
                 #{ident}-css-cookie::after {{
                     content: {cookie};
                 }}
+                #{ident}-css-sfs::after {{
+                    content: {sec_fetch_site};
+                }}
                 #{ident}-css-sah::after {{
                     content: {sec_fetch_storage_access};
                 }}
@@ -451,6 +467,7 @@ impl Request {
             origin = self.get(Header::Origin, Escape::Css),
             referer = self.get(Header::Referer, Escape::Css),
             cookie = self.get(Header::Cookie, Escape::Css),
+            sec_fetch_site = self.get(Header::SecFetchSite, Escape::Css),
             sec_fetch_storage_access = self.get(Header::SecFetchStorageAccess, Escape::Css),
         );
         warp::reply::with_header(response, "content-type", "text/css").into_response()
@@ -464,12 +481,14 @@ impl Request {
                 document.getElementById("{ident}-js-origin").innerText = {origin}
                 document.getElementById("{ident}-js-referer").innerText = {referer}
                 document.getElementById("{ident}-js-cookie").innerText = {cookie}
+                document.getElementById("{ident}-js-sfs").innerText = {sec_fetch_site}
                 document.getElementById("{ident}-js-sah").innerText = {sec_fetch_storage_access}
             "#,
             host = self.get(Header::Host, Escape::Css),
             origin = self.get(Header::Origin, Escape::Css),
             referer = self.get(Header::Referer, Escape::Css),
             cookie = self.get(Header::Cookie, Escape::Css),
+            sec_fetch_site = self.get(Header::SecFetchSite, Escape::Css),
             sec_fetch_storage_access = self.get(Header::SecFetchStorageAccess, Escape::Css),
         );
         warp::reply::with_header(response, "content-type", "text/javascript").into_response()
@@ -483,6 +502,7 @@ impl Request {
                     "origin": {origin},
                     "referer": {referer},
                     "cookie": {cookie},
+                    "sfs": {sec_fetch_site},
                     "sah": {sec_fetch_storage_access}
                 }}
             "#,
@@ -490,6 +510,7 @@ impl Request {
             origin = self.get(Header::Origin, Escape::Json),
             referer = self.get(Header::Referer, Escape::Json),
             cookie = self.get(Header::Cookie, Escape::Json),
+            sec_fetch_site = self.get(Header::SecFetchSite, Escape::Json),
             sec_fetch_storage_access = self.get(Header::SecFetchStorageAccess, Escape::Json),
         );
         let mut response =
@@ -517,12 +538,14 @@ impl Request {
                 Origin: {origin}, \
                 Referer: {referer}, \
                 Cookie: {cookie}, \
+                Sec-Fetch-Site: {sec_fetch_site}\
                 Sec-Fetch-Storage-Access: {sec_fetch_storage_access}\
             ",
             host = self.get(Header::Host, Escape::None),
             origin = self.get(Header::Origin, Escape::None),
             referer = self.get(Header::Referer, Escape::None),
             cookie = self.get(Header::Cookie, Escape::None),
+            sec_fetch_site = self.get(Header::SecFetchSite, Escape::None),
             sec_fetch_storage_access = self.get(Header::SecFetchStorageAccess, Escape::None),
         );
         let renderer = TextRenderer::default();
@@ -569,16 +592,25 @@ async fn main() {
         .and(warp::header::optional("origin"))
         .and(warp::header::optional("referer"))
         .and(warp::header::optional("cookie"))
+        .and(warp::header::optional("sec-fetch-site"))
         // storage-access-header request
         .and(warp::header::optional("sec-fetch-storage-access"))
         .map(
-            |endpoint, query, host, origin, referer, cookie, sec_fetch_storage_access| {
+            |endpoint,
+             query,
+             host,
+             origin,
+             referer,
+             cookie,
+             sec_fetch_site,
+             sec_fetch_storage_access| {
                 Request {
                     host,
                     query,
                     origin,
                     referer,
                     cookie,
+                    sec_fetch_site,
                     sec_fetch_storage_access,
                 }
                 .respond(endpoint)

@@ -36,6 +36,7 @@ use warp::{
 struct Query {
     id: Option<Uuid>,
     target: Option<Url>,
+    iframe: Option<String>,
 }
 
 struct Request {
@@ -298,12 +299,35 @@ impl Request {
 }
 
 impl Request {
+    fn get_iframe_url(&self) -> String {
+        if let Some(iframe) = self.query.iframe.as_ref() {
+            if let Some((first, remaining)) = iframe.split_once(",") {
+                match first {
+                    "cx" => format!("https://sah.yet.cx/storage-access/?iframe={remaining}"),
+                    "wiki" => format!("https://sah.yet.wiki/storage-access/?iframe={remaining}"),
+                    "rocks" => format!("https://sah.neon.rocks/storage-access/?iframe={remaining}"),
+                    _ => "about:blank".to_string(),
+                }
+            } else {
+                match iframe.as_str() {
+                    "cx" => "https://sah.yet.cx/storage-access/".to_string(),
+                    "wiki" => "https://sah.yet.wiki/storage-access/".to_string(),
+                    "rocks" => "https://sah.neon.rocks/storage-access/".to_string(),
+                    _ => "about:blank".to_string(),
+                }
+            }
+        } else {
+            "about:blank".to_string()
+        }
+    }
+
     fn main(&self, url: &Url) -> Response {
         let style = self.style();
         let fetch = Request::table("fetch");
         let css = Request::table("css");
         let js = Request::table("js");
         let iframe_id = Uuid::new_v4();
+        let iframe_url = self.get_iframe_url();
         let target = url::form_urlencoded::Serializer::new(String::new())
             .append_pair("target", url.as_str())
             .finish();
@@ -315,7 +339,7 @@ impl Request {
                 <body>
                     {style}
                     <h1>Storage-Access-API test ground</h1>
-                    Url: {url}<br>
+                    Url: <span id="url">{url}</span><br>
                     If a header doesn't exist, null will be displayed. If it has a value, an additional round of quotes (&quot;) will be displayed.<br>
                     Links to set unpartitioned storage on the third party domain:
                     <table>
@@ -427,7 +451,7 @@ impl Request {
                             <td class="cx"><a href="https://sah.yet.cx/storage-access/iframe.html" target="{iframe_id}">iframe</a></td>
                         </tr>
                     </table>
-                    <iframe name="{iframe_id}" src="about:blank" width="100%" height="2000"></iframe>
+                    <iframe name="{iframe_id}" src="{iframe_url}" width="100%" height="2000"></iframe>
                 </body>
             </html>"#,
             host = self.get(Header::Host, Escape::Html),

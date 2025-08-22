@@ -328,6 +328,12 @@ impl Request {
         let js = Request::table("js");
         let iframe_id = Uuid::new_v4();
         let iframe_url = self.get_iframe_url();
+        let own_ident = match url.domain() {
+            Some("sah.neon.rocks") => "rocks",
+            Some("sah.yet.wiki") => "wiki",
+            Some("sah.yet.cx") => "cx",
+            _ => "",
+        };
         let target = url::form_urlencoded::Serializer::new(String::new())
             .append_pair("target", url.as_str())
             .finish();
@@ -337,6 +343,18 @@ impl Request {
             <html>
                 <head><title>Storage-Access-API test ground</title></head>
                 <body>
+                    <script>
+                        function updateUrl(iframe) {{
+                            let url = "{url}?iframe=" + iframe;
+                            window.history.pushState({{ path: url }}, "", url);
+                            if (window.parent !== window) {{
+                                window.parent.postMessage("{own_ident}," + iframe, "*");
+                            }}
+                        }}
+                        window.addEventListener("message", (e) => {{
+                            updateUrl(e.data);
+                        }})
+                    </script>
                     {style}
                     <h1>Storage-Access-API test ground</h1>
                     Url: <span id="url">{url}</span><br>
@@ -446,9 +464,9 @@ impl Request {
                             </tr>
                         </thead>
                         <tr>
-                            <td class="neon"><a href="https://sah.neon.rocks/storage-access/iframe.html" target="{iframe_id}">iframe</a></td>
-                            <td class="wiki"><a href="https://sah.yet.wiki/storage-access/iframe.html" target="{iframe_id}">iframe</a></td>
-                            <td class="cx"><a href="https://sah.yet.cx/storage-access/iframe.html" target="{iframe_id}">iframe</a></td>
+                            <td class="neon"><a onclick="return updateUrl('rocks');" href="https://sah.neon.rocks/storage-access/iframe.html" target="{iframe_id}">iframe</a></td>
+                            <td class="wiki"><a onclick="return updateUrl('wiki');" href="https://sah.yet.wiki/storage-access/iframe.html" target="{iframe_id}">iframe</a></td>
+                            <td class="cx"><a onclick="return updateUrl('cx');" href="https://sah.yet.cx/storage-access/iframe.html" target="{iframe_id}">iframe</a></td>
                         </tr>
                     </table>
                     <iframe name="{iframe_id}" src="{iframe_url}" width="100%" height="2000"></iframe>

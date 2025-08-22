@@ -2,8 +2,7 @@ use image::{imageops, DynamicImage, ImageFormat, Rgba, RgbaImage};
 use std::io::Cursor;
 use text_to_png::TextRenderer;
 
-/// Render the headers as a multiline PNG with a custom background color.
-/// Example: `self.png_with_bg("#FFFFFF")`
+/// render the headers as a multiline PNG with a custom background color.
 pub fn png_with_bg(text: &str, bg: Rgba<u8>) -> Vec<u8> {
     // render text line by line
     let renderer = TextRenderer::default();

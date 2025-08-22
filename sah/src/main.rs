@@ -25,11 +25,11 @@ use text_to_png::TextRenderer;
 use url::Url;
 use uuid::Uuid;
 use warp::{
-    Filter,
     filters::path::Tail,
     http::{HeaderValue, StatusCode},
     hyper::Body,
     reply::{self, Reply, Response},
+    Filter,
 };
 
 #[derive(Deserialize)]
@@ -538,7 +538,7 @@ impl Request {
                 Origin: {origin}, \
                 Referer: {referer}, \
                 Cookie: {cookie}, \
-                Sec-Fetch-Site: {sec_fetch_site}\
+                Sec-Fetch-Site: {sec_fetch_site}, \
                 Sec-Fetch-Storage-Access: {sec_fetch_storage_access}\
             ",
             host = self.get(Header::Host, Escape::None),

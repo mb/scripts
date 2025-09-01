@@ -1,7 +1,8 @@
+use percent_encoding::{percent_encode, utf8_percent_encode, NON_ALPHANUMERIC};
 use serde::{Serialize, Serializer};
 use serde_json::Value;
 use std::{cmp::Ordering, collections::BTreeMap, env};
-use url::Url;
+use url::{EncodingOverride, Url};
 
 #[derive(Debug, Clone, Eq, PartialEq, PartialOrd, Hash)]
 struct BugzillaKey(String);
@@ -21,6 +22,7 @@ fn is_advanced(s: &str) -> Option<i32> {
 
 fn presort_fields(field: &str) -> i32 {
     match field {
+        "query_based_on" => 0,
         "product" => 1,
         "component" => 2,
         "status" => 3,
@@ -67,15 +69,12 @@ fn main() {
     }
 
     let url = Url::parse(&args[1]).expect("Argument is not an URL");
+    let mut out_url = url.clone();
 
     // stable output order
     let mut map = BTreeMap::new();
     for (key, value) in url.query_pairs() {
-        if key == "query_based_on"
-            || key == "list_id"
-            || key == "classification"
-            || key == "known_name"
-        {
+        if key == "list_id" || key == "classification" || key == "known_name" {
             continue;
         }
         let key = BugzillaKey(key.to_string());
@@ -94,6 +93,35 @@ fn main() {
             map.insert(key, Value::String(value.to_string()));
         }
     }
+    {
+        let mut out_query = out_url.query_pairs_mut();
+        out_query.clear();
+        // sort array and also output more beautiful URL
+        for (key, value) in &mut map {
+            match value {
+                Value::String(ref s) => {
+                    out_query.append_pair(&key.0, &s);
+                }
+                Value::Array(ref mut values) => {
+                    values.sort_by(|s1, s2| match (s1, s2) {
+                        (Value::String(s1), Value::String(s2)) => s1.cmp(s2),
+                        _ => unreachable!("only strings should be in the array"),
+                    });
+                    for v in values.iter() {
+                        match v {
+                            Value::String(s) => {
+                                out_query.append_pair(&key.0, &s);
+                            }
+                            _ => unreachable!("only strings should be in the array"),
+                        }
+                    }
+                }
+                _ => panic!("unreachable"),
+            }
+        }
+        out_query.finish();
+    }
 
+    println!("{out_url}");
     println!("{}", serde_json::to_string_pretty(&map).unwrap());
 }

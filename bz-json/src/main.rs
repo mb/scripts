@@ -1,8 +1,7 @@
-use percent_encoding::{percent_encode, utf8_percent_encode, NON_ALPHANUMERIC};
 use serde::{Serialize, Serializer};
 use serde_json::Value;
 use std::{cmp::Ordering, collections::BTreeMap, env};
-use url::{EncodingOverride, Url};
+use url::Url;
 
 #[derive(Debug, Clone, Eq, PartialEq, PartialOrd, Hash)]
 struct BugzillaKey(String);

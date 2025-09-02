@@ -476,7 +476,7 @@ impl Request {
         };
         let activate_header = if let Some(activate) = self.query.activate {
             format!(
-                r#"<pre style="display:inline">"Activate-Storage-Access: {}"</pre>"#,
+                r#""<pre style="display:inline">Activate-Storage-Access: {}</pre>""#,
                 activate.header_value()
             )
         } else {

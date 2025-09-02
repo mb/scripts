@@ -264,7 +264,7 @@ impl Request {
             }
         }
         // forward current id via url param and store as cookie if it didn't exist
-        let id = id.unwrap_or_else(Uuid::now_v7);
+        let id = id.unwrap_or_else(Uuid::new_v4);
         target.query_pairs_mut().append_pair("id", &id.to_string());
         warp::http::Response::builder()
             .header("Location", target.as_str())

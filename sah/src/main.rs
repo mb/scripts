@@ -18,6 +18,8 @@
 //! * script-track -> tries to set unpartitioned state
 //! * image-track -> tries to set unpartitioned state
 
+use std::str::FromStr;
+
 use cookie::Cookie;
 use image::Rgba;
 use indoc::formatdoc;
@@ -410,22 +412,34 @@ impl Request {
 }
 
 impl Request {
+    fn generate_iframe_url(value: &str, remaining: Option<&str>) -> String {
+        let mut vs = value.split("-");
+        let Some(host) = vs.next() else {
+            return "about:blank".to_owned();
+        };
+        let mut url = match host {
+            "cx" => Url::from_str("https://sah.yet.cx/storage-access/iframe.html").unwrap(),
+            "wiki" => Url::from_str("https://sah.yet.wiki/storage-access/iframe.html").unwrap(),
+            "rocks" => Url::from_str("https://sah.neon.rocks/storage-access/iframe.html").unwrap(),
+            _ => return "about:blank".to_owned(),
+        };
+        if let Some(remaining) = remaining {
+            let mut params = url.query_pairs_mut();
+            params.append_pair("iframe", remaining);
+        }
+        if let Some(activate) = vs.next() {
+            let mut params = url.query_pairs_mut();
+            params.append_pair("activate", activate);
+        }
+        url.to_string()
+    }
+
     fn get_iframe_url(&self) -> String {
         if let Some(iframe) = self.query.iframe.as_ref() {
             if let Some((first, remaining)) = iframe.split_once(",") {
-                match first {
-                    "cx" => format!("https://sah.yet.cx/storage-access/?iframe={remaining}"),
-                    "wiki" => format!("https://sah.yet.wiki/storage-access/?iframe={remaining}"),
-                    "rocks" => format!("https://sah.neon.rocks/storage-access/?iframe={remaining}"),
-                    _ => "about:blank".to_string(),
-                }
+                Request::generate_iframe_url(first, Some(remaining))
             } else {
-                match iframe.as_str() {
-                    "cx" => "https://sah.yet.cx/storage-access/".to_string(),
-                    "wiki" => "https://sah.yet.wiki/storage-access/".to_string(),
-                    "rocks" => "https://sah.neon.rocks/storage-access/".to_string(),
-                    _ => "about:blank".to_string(),
-                }
+                Request::generate_iframe_url(iframe, None)
             }
         } else {
             "about:blank".to_string()
@@ -445,8 +459,18 @@ impl Request {
             Some("sah.yet.cx") => "cx",
             _ => "",
         };
+        let own_ident = if let Some(activate) = self.query.activate {
+            format!("{own_ident}-{}", activate.query_param())
+        } else {
+            own_ident.to_string()
+        };
         let query_params = if let Some(activate) = self.query.activate {
             format!("?activate={}", activate.query_param())
+        } else {
+            String::new()
+        };
+        let query_params_and = if let Some(activate) = self.query.activate {
+            format!("&activate={}", activate.query_param())
         } else {
             String::new()
         };
@@ -470,10 +494,16 @@ impl Request {
                     <script>
                         // update URL
                         function updateUrl(iframe) {{
-                            let url = "{url}?iframe=" + iframe;
-                            window.history.pushState({{ path: url }}, "", url);
+                            if (iframe !== "") {{
+                                // only update our own url if called via postMessage from iframe, not on load
+                                let url = "{url}?iframe=" + iframe + "{query_params_and}";
+                                window.history.pushState({{ path: url }}, "", url);
+                            }}
+                            let own_ident = iframe === "" ? "{own_ident}" : "{own_ident}," + iframe;
+                            // there is currently no way to navigate to about:blank. Assume we are top level load
+                            // with no iframes if own_ident stays empty
                             if (window.parent !== window) {{
-                                window.parent.postMessage({{ type: "nav", url: "{own_ident}," + iframe }}, "*");
+                                window.parent.postMessage({{ type: "nav", url: own_ident }}, "*");
                             }}
                         }}
 
@@ -613,6 +643,8 @@ impl Request {
                             }}
                             // also fill has-storage-access
                             hasStorageAccess();
+                            // also update url
+                            updateUrl("");
                         }}
                     </script>
                     <h2>CSS headers <small>(<a href="/storage-access/style.css{query_params}">/storage-access/style.css{query_params}</a>)</small></h2>
@@ -639,9 +671,9 @@ impl Request {
                             </tr>
                         </thead>
                         <tr>
-                            <td class="neon"><a onclick="return updateUrl('rocks');" href="https://sah.neon.rocks/storage-access/iframe.html{query_params}" target="{iframe_id}">iframe</a></td>
-                            <td class="wiki"><a onclick="return updateUrl('wiki');" href="https://sah.yet.wiki/storage-access/iframe.html{query_params}" target="{iframe_id}">iframe</a></td>
-                            <td class="cx"><a onclick="return updateUrl('cx');" href="https://sah.yet.cx/storage-access/iframe.html{query_params}" target="{iframe_id}">iframe</a></td>
+                            <td class="neon"><a href="https://sah.neon.rocks/storage-access/iframe.html{query_params}" target="{iframe_id}">iframe</a></td>
+                            <td class="wiki"><a href="https://sah.yet.wiki/storage-access/iframe.html{query_params}" target="{iframe_id}">iframe</a></td>
+                            <td class="cx"><a href="https://sah.yet.cx/storage-access/iframe.html{query_params}" target="{iframe_id}">iframe</a></td>
                         </tr>
                     </table>
                     <iframe name="{iframe_id}" src="{iframe_url}" width="100%" height="100"></iframe>

@@ -34,11 +34,45 @@ use warp::{
 
 mod to_png;
 
+#[derive(Clone, Copy, Debug, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+enum Activate {
+    Load,
+    // reload for the remaining ones
+    Cx,
+    Wiki,
+    Rocks,
+    Star,
+}
+
+impl Activate {
+    fn header_value(self) -> &'static str {
+        match self {
+            Activate::Load => "load",
+            Activate::Cx => r#"reload; allowed-origin="https://sah.yet.cx/""#,
+            Activate::Wiki => r#"reload; allowed-origin="https://sah.yet.wiki/""#,
+            Activate::Rocks => r#"reload; allowed-origin="https://sah.neon.rocks/""#,
+            Activate::Star => r#"reload; allowed-origin=*"#,
+        }
+    }
+
+    fn query_param(self) -> &'static str {
+        match self {
+            Activate::Load => "load",
+            Activate::Cx => "cx",
+            Activate::Wiki => "wiki",
+            Activate::Rocks => "rocks",
+            Activate::Star => "star",
+        }
+    }
+}
+
 #[derive(Deserialize)]
 struct Query {
     id: Option<Uuid>,
     target: Option<Url>,
     iframe: Option<String>,
+    activate: Option<Activate>,
 }
 
 struct Request {
@@ -161,6 +195,7 @@ impl Request {
                 .wiki {{ background-color: {wiki}; }}
                 .cx {{ background-color: {cx}; }}
                 .neon {{ background-color: {neon}; }}
+                .null, .star, .load {{ background-color: white; }}
                 p {{
                     margin: 0;
                 }}
@@ -410,6 +445,19 @@ impl Request {
             Some("sah.yet.cx") => "cx",
             _ => "",
         };
+        let query_params = if let Some(activate) = self.query.activate {
+            format!("?activate={}", activate.query_param())
+        } else {
+            String::new()
+        };
+        let activate_header = if let Some(activate) = self.query.activate {
+            format!(
+                r#"<pre>"Activate-Storage-Access: {}"</pre>"#,
+                activate.header_value()
+            )
+        } else {
+            "null".to_string()
+        };
         let target = url::form_urlencoded::Serializer::new(String::new())
             .append_pair("target", url.as_str())
             .finish();
@@ -494,6 +542,20 @@ impl Request {
                             <td class="cx"><a href="https://sah.yet.cx/storage-access/clear?{target}">clear</a></td>
                         </tr>
                     </table>
+                    <h2>Activate-Storage-Access response header</h2>
+                    Current: {activate_header}</br>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="null"><a href="{url}">null</a></th>
+                                <th class="load"><a href="{url}?activate=load">load</a></th>
+                                <th class="star"><a href="{url}?activate=star">star</a></th>
+                                <th class="neon"><a href="{url}?activate=rocks">rocks</a></th>
+                                <th class="wiki"><a href="{url}?activate=wiki">wiki</a></th>
+                                <th class="cx"><a href="{url}?activate=cx">cx</a></th>
+                            </tr>
+                        </thead>
+                    </table>
                     <h2>Main document headers</h2>
                     <p>Host: <span class="cookie">{host}</span></p>
                     <p>Origin: <span class="origin">{origin}</span></p>
@@ -529,16 +591,16 @@ impl Request {
                     </script>
                     <p><button onclick="window.hasStorageAccess();"><code>document.hasStorageAccess</code></button> <span id="has-storage-access"></span></p>
                     <p><button onclick="window.requestStorageAccess();"><code>document.requestStorageAccess</code></button> <span id="request-storage-access"></span></p>
-                    <h2>Fetch headers <a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#including_credentials">with credentials</a><small> (<a href="/storage-access/fetch.json">/storage-access/fetch.json</a>)</small></h2>
+                    <h2>Fetch headers <a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#including_credentials">with credentials</a><small> (<a href="/storage-access/fetch.json{query_params}">/storage-access/fetch.json{query_params}</a>)</small></h2>
                     {fetch}
                     <script>
                         window.onload = () => {{
                             // fill fetch
                             let headers = ["host", "origin", "referer", "cookie", "sfd", "sfm", "sfs", "sfu", "sah"];
                             let sites = {{
-                                neon: "https://sah.neon.rocks/storage-access/fetch.json",
-                                wiki: "https://sah.yet.wiki/storage-access/fetch.json",
-                                cx: "https://sah.yet.cx/storage-access/fetch.json",
+                                neon: "https://sah.neon.rocks/storage-access/fetch.json{query_params}",
+                                wiki: "https://sah.yet.wiki/storage-access/fetch.json{query_params}",
+                                cx: "https://sah.yet.cx/storage-access/fetch.json{query_params}",
                             }}
                             for (const [key, site] of Object.entries(sites)) {{
                                 fetch(site, {{ credentials: "include" }})
@@ -553,20 +615,20 @@ impl Request {
                             hasStorageAccess();
                         }}
                     </script>
-                    <h2>CSS headers <small>(<a href="/storage-access/style.css">/storage-access/style.css</a>)</small></h2>
+                    <h2>CSS headers <small>(<a href="/storage-access/style.css{query_params}">/storage-access/style.css{query_params}</a>)</small></h2>
                     {css}
-                    <link href="https://sah.neon.rocks/storage-access/style.css" rel="stylesheet" />
-                    <link href="https://sah.yet.wiki/storage-access/style.css" rel="stylesheet" />
-                    <link href="https://sah.yet.cx/storage-access/style.css" rel="stylesheet" />
-                    <h2>Script headers <small>(<a href="/storage-access/script.js">/storage-access/script.js</a>)</small></h2>
+                    <link href="https://sah.neon.rocks/storage-access/style.cs{query_params}s" rel="stylesheet" />
+                    <link href="https://sah.yet.wiki/storage-access/style.css{query_params}" rel="stylesheet" />
+                    <link href="https://sah.yet.cx/storage-access/style.css{query_params}" rel="stylesheet" />
+                    <h2>Script headers <small>(<a href="/storage-access/script.js{query_params}">/storage-access/script.js{query_params}</a>)</small></h2>
                     {js}
-                    <script src="https://sah.neon.rocks/storage-access/script.js"></script>
-                    <script src="https://sah.yet.wiki/storage-access/script.js"></script>
-                    <script src="https://sah.yet.cx/storage-access/script.js"></script>
-                    <h2>Image headers <small>(<a href="/storage-access/image.png">/storage-access/image.png</a>)</small></h2>
-                    <img src="https://sah.neon.rocks/storage-access/image.png" />
-                    <img src="https://sah.yet.wiki/storage-access/image.png" />
-                    <img src="https://sah.yet.cx/storage-access/image.png" />
+                    <script src="https://sah.neon.rocks/storage-access/script.js{query_params}"></script>
+                    <script src="https://sah.yet.wiki/storage-access/script.js{query_params}"></script>
+                    <script src="https://sah.yet.cx/storage-access/script.js{query_params}"></script>
+                    <h2>Image headers <small>(<a href="/storage-access/image.png{query_params}">/storage-access/image.png{query_params}</a>)</small></h2>
+                    <img src="https://sah.neon.rocks/storage-access/image.png{query_params}" />
+                    <img src="https://sah.yet.wiki/storage-access/image.png{query_params}" />
+                    <img src="https://sah.yet.cx/storage-access/image.png{query_params}" />
                     <h2>Iframe headers</h2>
                     <table>
                         <thead>
@@ -577,9 +639,9 @@ impl Request {
                             </tr>
                         </thead>
                         <tr>
-                            <td class="neon"><a onclick="return updateUrl('rocks');" href="https://sah.neon.rocks/storage-access/iframe.html" target="{iframe_id}">iframe</a></td>
-                            <td class="wiki"><a onclick="return updateUrl('wiki');" href="https://sah.yet.wiki/storage-access/iframe.html" target="{iframe_id}">iframe</a></td>
-                            <td class="cx"><a onclick="return updateUrl('cx');" href="https://sah.yet.cx/storage-access/iframe.html" target="{iframe_id}">iframe</a></td>
+                            <td class="neon"><a onclick="return updateUrl('rocks');" href="https://sah.neon.rocks/storage-access/iframe.html{query_params}" target="{iframe_id}">iframe</a></td>
+                            <td class="wiki"><a onclick="return updateUrl('wiki');" href="https://sah.yet.wiki/storage-access/iframe.html{query_params}" target="{iframe_id}">iframe</a></td>
+                            <td class="cx"><a onclick="return updateUrl('cx');" href="https://sah.yet.cx/storage-access/iframe.html{query_params}" target="{iframe_id}">iframe</a></td>
                         </tr>
                     </table>
                     <iframe name="{iframe_id}" src="{iframe_url}" width="100%" height="100"></iframe>
@@ -749,7 +811,7 @@ impl Request {
                 (endpoint.as_str(), None)
             };
 
-        match endpoint {
+        let mut response = match endpoint {
             // information
             "" | "iframe.html" => self.main(&url),
             "style.css" => self.css(),
@@ -762,7 +824,15 @@ impl Request {
             "clear" => self.clear(leftover),
             _ => reply::with_status(format!("Not found! {url}"), StatusCode::NOT_FOUND)
                 .into_response(),
+        };
+        if let Some(activate) = self.query.activate {
+            let headers = response.headers_mut();
+            headers.append(
+                "activate-storage-access",
+                HeaderValue::from_static(activate.header_value()),
+            );
         }
+        response
     }
 }
 

@@ -9,9 +9,9 @@ struct BugzillaKey(String);
 fn is_advanced(s: &str) -> Option<i32> {
     let (head, tail) = s.split_at_checked(1)?;
     let add = match head {
-        "v" => 0,
+        "f" => 0,
         "o" => 1,
-        "f" => 2,
+        "v" => 2,
         "j" => 3,
         _ => return None,
     };

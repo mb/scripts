@@ -649,7 +649,7 @@ impl Request {
                     </script>
                     <h2>CSS headers <small>(<a href="/storage-access/style.css{query_params}">/storage-access/style.css{query_params}</a>)</small></h2>
                     {css}
-                    <link href="https://sah.neon.rocks/storage-access/style.cs{query_params}s" rel="stylesheet" />
+                    <link href="https://sah.neon.rocks/storage-access/style.css{query_params}" rel="stylesheet" />
                     <link href="https://sah.yet.wiki/storage-access/style.css{query_params}" rel="stylesheet" />
                     <link href="https://sah.yet.cx/storage-access/style.css{query_params}" rel="stylesheet" />
                     <h2>Script headers <small>(<a href="/storage-access/script.js{query_params}">/storage-access/script.js{query_params}</a>)</small></h2>

@@ -40,7 +40,7 @@ mod to_png;
 #[serde(rename_all = "kebab-case")]
 enum Activate {
     Load,
-    // reload for the remaining ones
+    // retry for the remaining ones
     Cx,
     Wiki,
     Rocks,
@@ -51,10 +51,10 @@ impl Activate {
     fn header_value(self) -> &'static str {
         match self {
             Activate::Load => "load",
-            Activate::Cx => r#"reload; allowed-origin="https://sah.yet.cx/""#,
-            Activate::Wiki => r#"reload; allowed-origin="https://sah.yet.wiki/""#,
-            Activate::Rocks => r#"reload; allowed-origin="https://sah.neon.rocks/""#,
-            Activate::Star => r#"reload; allowed-origin=*"#,
+            Activate::Cx => r#"retry; allowed-origin="https://sah.yet.cx/""#,
+            Activate::Wiki => r#"retry; allowed-origin="https://sah.yet.wiki/""#,
+            Activate::Rocks => r#"retry; allowed-origin="https://sah.neon.rocks/""#,
+            Activate::Star => r#"retry; allowed-origin=*"#,
         }
     }
 

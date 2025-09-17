@@ -448,6 +448,7 @@ impl Request {
 
     fn main(&self, url: &Url) -> Response {
         let style = self.style();
+        let fetch_credential = Request::table("fetchcredential");
         let fetch = Request::table("fetch");
         let css = Request::table("css");
         let js = Request::table("js");
@@ -622,6 +623,8 @@ impl Request {
                     <p><button onclick="window.hasStorageAccess();"><code>document.hasStorageAccess</code></button> <span id="has-storage-access"></span></p>
                     <p><button onclick="window.requestStorageAccess();"><code>document.requestStorageAccess</code></button> <span id="request-storage-access"></span></p>
                     <h2>Fetch headers <a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#including_credentials">with credentials</a><small> (<a href="/storage-access/fetch.json{query_params}">/storage-access/fetch.json{query_params}</a>)</small></h2>
+                    {fetch_credential}
+                    <h2>Fetch headers (<a href="/storage-access/fetch.json{query_params}">/storage-access/fetch.json{query_params}</a>)</small></h2>
                     {fetch}
                     <script>
                         window.onload = () => {{
@@ -633,7 +636,16 @@ impl Request {
                                 cx: "https://sah.yet.cx/storage-access/fetch.json{query_params}",
                             }}
                             for (const [key, site] of Object.entries(sites)) {{
+                                // with credentials
                                 fetch(site, {{ credentials: "include" }})
+                                    .then((response) => response.json())
+                                    .then((response) => {{
+                                        for (const header in headers) {{
+                                            document.getElementById(key+"-fetchcredential-"+headers[header]).innerText = response[headers[header]];
+                                        }}
+                                    }});
+                                // without credentials
+                                fetch(site)
                                     .then((response) => response.json())
                                     .then((response) => {{
                                         for (const header in headers) {{

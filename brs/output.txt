@@ -1,0 +1,463 @@
+Bugzilla query: https://bugzilla.mozilla.org/rest/bug?include_fields=id,blocks,depends_on,summary&id=1850793,1962725,1963384,1960872,1971535,1963418,1869585,1963419,1962722,1963377,1963387,1962713,1962711,1963416,1866290,1949475,1962673,1960877,1962724,1962718,1960868,1894088,1969882,1963420,1963391,1960874,1963422,1970377,1962719,1963382,1963311,1962716,1962367,1963380,1963370,1962727,1963389,1963379,1944074,1962721,1962463,1962723,1963417,1740763,1968970,1963376,1963386,1962712,1960862,1962564,1839375,1970603,1963414,1853117,1972018,1963388,1963378,1960865,1960871,1962715,1962717,1944781,1963390,1963421,1963423,1962726,1963392,1973175,1973185,1969919,1960851,1962729,1960878,1963381,1963383,1772545,1962728,1962714,1940042,1962443
+[BlockingBug { id: 1740763, summary: "Revert partitioning skiplist intervention for Microsoft login", depends_on: [1638383, 1734621, 1747889, 1747895, 1747896, 1775500], blocks: [1537702] }, BlockingBug { id: 1772545, summary: "Revert partitioning skiplist intervention for login.live.com", depends_on: [1747889, 1747895], blocks: [1537702] }, BlockingBug { id: 1839375, summary: "Revert partitioning skiplist intervention for tsn.ca login", depends_on: [1802340], blocks: [1537702] }, BlockingBug { id: 1850793, summary: "Revert partitioning skiplist intervention for www.msn.com login", depends_on: [1846712], blocks: [1537702] }, BlockingBug { id: 1853117, summary: "Revert query-stripping allowlist for googleadservices.com", depends_on: [1853049], blocks: [1537702] }, BlockingBug { id: 1866290, summary: "Revert UrlClassifier feature fingerprinting allowlist for geetest.com", depends_on: [1862274], blocks: [1537702] }, BlockingBug { id: 1869585, summary: "Revert partitioning skiplist intervention for blogger.com", depends_on: [1869507], blocks: [1537702] }, BlockingBug { id: 1894088, summary: "Revert fingerprinting protection webcompat overrides for Google domains", depends_on: [1882761], blocks: [1537702] }, BlockingBug { id: 1940042, summary: "Revert partitioning skiplist intervention for bat.bing.com", depends_on: [], blocks: [1537702] }, BlockingBug { id: 1944074, summary: "Revert partitioning skiplist intervention for www.messenger.com", depends_on: [1934814], blocks: [1537702] }, BlockingBug { id: 1944781, summary: "Revert partitioning skiplist intervention for onetrust", depends_on: [1935385], blocks: [1537702] }, BlockingBug { id: 1949475, summary: "Revert partitioning skiplist intervention for boostr.com", depends_on: [1943970], blocks: [1537702] }, BlockingBug { id: 1960851, summary: "Revert global intervention for HubSpot Forms", depends_on: [1897399, 1911297, 1912034, 1915163, 1916633, 1920013, 1923034, 1923365, 1924707, 1926863, 1938112, 1942026, 1947133, 1947175, 1950305, 1952159, 1954451, 1967233], blocks: [1537702] }, BlockingBug { id: 1960862, summary: "Revert global intervention for a.pub.network", depends_on: [1914872, 1939463, 1947186, 1975163], blocks: [1537702] }, BlockingBug { id: 1960865, summary: "Revert global intervention for Shogun", depends_on: [1913097, 1914194, 1923283], blocks: [1537702] }, BlockingBug { id: 1960868, summary: "Revert global intervention for SAP OnDemand", depends_on: [1880790, 1911307, 1946025, 1950630], blocks: [1537702] }, BlockingBug { id: 1960871, summary: "Revert global intervention for LINE", depends_on: [1904667, 1914175, 1927779, 1932596, 1944311], blocks: [1537702] }, BlockingBug { id: 1960872, summary: "Revert global intervention for Didomi / privacy-center.org", depends_on: [1903859, 1909199, 1909608, 1915611, 1923823, 1928419, 1930596, 1930692, 1937070, 1938390, 1939265, 1948725, 1954938, 1956196, 1970380, 1984025], blocks: [1537702] }, BlockingBug { id: 1960874, summary: "Revert global intervention for VTEX", depends_on: [1731356, 1636947, 1722853, 1724189, 1727831, 1732852, 1734790, 1735111, 1736981, 1739975, 1740005, 1742766, 1744704, 1745421, 1749304, 1750704, 1765353, 1766969, 1774407, 1778724, 1798907, 1911964, 1935396, 1952853, 1957580, 1961791], blocks: [1537702] }, BlockingBug { id: 1960877, summary: "Revert global intervention for Piano / TinyPass", depends_on: [1906062, 1906635, 1910356, 1915376, 1923558, 1924990, 1935932, 1944342, 1947404, 1948891, 1949365, 1949386, 1950395, 1952236, 1952256, 1953121, 1956274, 1966582], blocks: [1537702] }, BlockingBug { id: 1960878, summary: "Revert global intervention for Salesforce", depends_on: [1779182, 1913683, 1919209, 1953870], blocks: [1537702] }, BlockingBug { id: 1962367, summary: "Revert global intervention for InMobi CMP", depends_on: [1844015, 1854433, 1877437, 1893987, 1933400, 1936585], blocks: [1537702] }, BlockingBug { id: 1962443, summary: "Revert global intervention for spot.im", depends_on: [1912947, 1918732, 1923338, 1932153, 1933718, 1952759, 1956265], blocks: [1537702] }, BlockingBug { id: 1962463, summary: "Revert global intervention for Hotmart", depends_on: [1770003, 1800899, 1931326, 1955354, 1967227], blocks: [1537702] }, BlockingBug { id: 1962564, summary: "Revert global intervention for Zendesk", depends_on: [1928102, 1833251, 1849976, 1911541, 1914200, 1915781, 1918052, 1929025, 1951679], blocks: [1537702] }, BlockingBug { id: 1962673, summary: "Revert global intervention for PerimeterX", depends_on: [1863742, 1906603, 1925236, 1938273, 1945436, 1946352, 1949192, 1954779, 1962092], blocks: [1537702] }, BlockingBug { id: 1962711, summary: "Revert permanent interventions for blocked domains on podolyaka.ru", depends_on: [1909607], blocks: [1537702] }, BlockingBug { id: 1962712, summary: "Revert permanent interventions for blocked domains on www.bizjournals.com", depends_on: [1913891], blocks: [1537702] }, BlockingBug { id: 1962713, summary: "Revert permanent interventions for blocked domains on www.pnsk-online.ru", depends_on: [1936559], blocks: [1537702] }, BlockingBug { id: 1962714, summary: "Revert permanent interventions for blocked domains on rf4trophies.com", depends_on: [1935649], blocks: [1537702] }, BlockingBug { id: 1962715, summary: "Revert permanent interventions for blocked domains on www.ursamajorvt.com", depends_on: [1957906], blocks: [1537702] }, BlockingBug { id: 1962716, summary: "Revert permanent interventions for blocked domains on massolit.io", depends_on: [1920069], blocks: [1537702] }, BlockingBug { id: 1962717, summary: "Revert permanent interventions for blocked domains on m.sporx.com", depends_on: [1913055], blocks: [1537702] }, BlockingBug { id: 1962718, summary: "Revert permanent interventions for blocked domains on www.zdnet.com", depends_on: [1940925], blocks: [1537702] }, BlockingBug { id: 1962719, summary: "Revert permanent interventions for blocked domains on www.briogeohair.com", depends_on: [1957590, 1958475], blocks: [1537702] }, BlockingBug { id: 1962721, summary: "Revert permanent interventions for blocked domains on www.buzzfeed.com", depends_on: [1932370], blocks: [1537702] }, BlockingBug { id: 1962722, summary: "Revert permanent interventions for blocked domains on www.dickblick.com", depends_on: [1960312], blocks: [1537702] }, BlockingBug { id: 1962723, summary: "Revert permanent interventions for blocked domains on www.fastssh.com", depends_on: [1961759], blocks: [1537702] }, BlockingBug { id: 1962724, summary: "Revert permanent interventions for blocked domains on kurasu.kyoto", depends_on: [1956434], blocks: [1537702] }, BlockingBug { id: 1962725, summary: "Revert permanent interventions for blocked domains on www.nu3.ch", depends_on: [1914166], blocks: [1537702] }, BlockingBug { id: 1962726, summary: "Revert permanent interventions for blocked domains on abfindungshero.de", depends_on: [1933182], blocks: [1537702] }, BlockingBug { id: 1962727, summary: "Revert permanent interventions for blocked domains on www.cbsnews.com", depends_on: [1934911], blocks: [1537702] }, BlockingBug { id: 1962728, summary: "Revert permanent interventions for blocked domains on fuliba2023.net", depends_on: [1921456], blocks: [1537702] }, BlockingBug { id: 1962729, summary: "Revert permanent interventions for blocked domains on anitaku.pe", depends_on: [1916443], blocks: [1537702] }, BlockingBug { id: 1963311, summary: "Revert permanent interventions for blocked domains on www.pch.com", depends_on: [1907799], blocks: [1537702] }, BlockingBug { id: 1963370, summary: "Revert global intervention for Medallia", depends_on: [1880285, 1948597, 1962066], blocks: [1537702] }, BlockingBug { id: 1963376, summary: "Revert permanent interventions for blocked domains on www.epocrates.com", depends_on: [1939253], blocks: [1537702] }, BlockingBug { id: 1963377, summary: "Revert permanent interventions for blocked domains on www.lebonbon.fr", depends_on: [1877455], blocks: [1537702] }, BlockingBug { id: 1963378, summary: "Revert permanent interventions for blocked domains on flights.skyexpress.gr", depends_on: [1901221], blocks: [1537702] }, BlockingBug { id: 1963379, summary: "Revert permanent interventions for blocked domains on instapundit.com", depends_on: [1949372], blocks: [1537702] }, BlockingBug { id: 1963380, summary: "Revert permanent interventions for blocked domains on rafflehouse.com", depends_on: [1942302], blocks: [1537702] }, BlockingBug { id: 1963381, summary: "Revert permanent interventions for blocked domains on www.ourtime.com", depends_on: [1828602], blocks: [1537702] }, BlockingBug { id: 1963382, summary: "Revert permanent interventions for blocked domains on uwp-wifi-access-portal.cox.com", depends_on: [1933714], blocks: [1537702] }, BlockingBug { id: 1963383, summary: "Revert permanent interventions for blocked domains on sferum.ru", depends_on: [1945841], blocks: [1537702] }, BlockingBug { id: 1963384, summary: "Revert permanent interventions for blocked domains on chat.zalo.me", depends_on: [1928996], blocks: [1537702] }, BlockingBug { id: 1963386, summary: "Revert permanent interventions for blocked domains on wenku.so.com", depends_on: [1928081], blocks: [1537702] }, BlockingBug { id: 1963387, summary: "Revert permanent interventions for blocked domains on xstalk.com", depends_on: [1953071], blocks: [1537702] }, BlockingBug { id: 1963388, summary: "Revert permanent interventions for blocked domains on www.tipranks.com", depends_on: [1872829], blocks: [1537702] }, BlockingBug { id: 1963389, summary: "Revert permanent interventions for blocked domains on mybkexperience.com", depends_on: [1847496], blocks: [1537702] }, BlockingBug { id: 1963390, summary: "Revert permanent interventions for blocked domains on redditp.com", depends_on: [1864438], blocks: [1537702] }, BlockingBug { id: 1963391, summary: "Revert permanent interventions for blocked domains on inspiriert.exlibris.ch", depends_on: [1953093], blocks: [1537702] }, BlockingBug { id: 1963392, summary: "Revert permanent interventions for blocked domains on firpe.cn", depends_on: [1923375], blocks: [1537702] }, BlockingBug { id: 1963414, summary: "Revert permanent interventions for blocked domains on try.makevisible.com", depends_on: [1947391], blocks: [1537702] }, BlockingBug { id: 1963416, summary: "Revert permanent interventions for blocked domains on direct.lc.chat", depends_on: [1933988], blocks: [1537702] }, BlockingBug { id: 1963417, summary: "Revert permanent interventions for blocked domains on hao.360.com", depends_on: [1912057], blocks: [1537702] }, BlockingBug { id: 1963418, summary: "Revert permanent interventions for blocked domains on www.ornikar.com", depends_on: [1912398], blocks: [1537702] }, BlockingBug { id: 1963419, summary: "Revert permanent interventions for blocked domains on knowyourmeme.com", depends_on: [1929890], blocks: [1537702] }, BlockingBug { id: 1963420, summary: "Revert permanent interventions for blocked domains on photon-reddit.com", depends_on: [1918435], blocks: [1537702] }, BlockingBug { id: 1963421, summary: "Revert permanent interventions for blocked domains on www.whittard.co.uk", depends_on: [1908647], blocks: [1537702] }, BlockingBug { id: 1963422, summary: "Revert permanent interventions for blocked domains on www.outdoorsy.com", depends_on: [1910634], blocks: [1537702] }, BlockingBug { id: 1963423, summary: "Revert permanent interventions for blocked domains on abc7ny.com", depends_on: [1926255], blocks: [1537702] }, BlockingBug { id: 1968970, summary: "Revert global intervention for brid.tv", depends_on: [1930853, 1967239], blocks: [1537702] }, BlockingBug { id: 1969882, summary: "Revert global intervention for TurnTo", depends_on: [1717588, 1964696, 1966362], blocks: [1537702] }, BlockingBug { id: 1969919, summary: "Revert global intervention for LivePerson", depends_on: [1794549, 1968450], blocks: [1537702] }, BlockingBug { id: 1970377, summary: "Revert partitioning skiplist intervention for Google Chat", depends_on: [1926488], blocks: [1537702] }, BlockingBug { id: 1970603, summary: "Revert global intervention for Wistia", depends_on: [1915580, 1922248, 1924074, 1926861, 1943292, 1961174], blocks: [1537702] }, BlockingBug { id: 1971535, summary: "Revert fingerprinting protection webcompat overrides for wpy.fyi domains", depends_on: [1957427], blocks: [1537702] }, BlockingBug { id: 1972018, summary: "Revert global intervention for Rebuy", depends_on: [1921732, 1930700, 1960830, 1969420], blocks: [1537702] }, BlockingBug { id: 1973175, summary: "Revert permanent interventions for blocked domains on play.virginmediatelevision.ie", depends_on: [1970078], blocks: [1537702] }, BlockingBug { id: 1973185, summary: "Revert permanent interventions for blocked domains on www.tv8.it", depends_on: [1957061], blocks: [1537702] }]
+0. 1740763: 1638383 1734621 1747889 1747895 1747896 1775500 (https://bugzil.la/1740763 - Revert partitioning skiplist intervention for Microsoft login)
+  "bugIds": [
+    "1638383",
+    "1734621",
+    "1747889",
+    "1747895",
+    "1747896",
+    "1775500"
+  ],
+1. 1772545: 1747889 1747895 (https://bugzil.la/1772545 - Revert partitioning skiplist intervention for login.live.com)
+  "bugIds": [
+    "1747889",
+    "1747895"
+  ],
+2. 1839375: 1802340 (https://bugzil.la/1839375 - Revert partitioning skiplist intervention for tsn.ca login)
+  "bugIds": [
+    "1802340"
+  ],
+3. 1850793: 1846712 (https://bugzil.la/1850793 - Revert partitioning skiplist intervention for www.msn.com login)
+  "bugIds": [
+    "1846712"
+  ],
+4. 1853117: 1853049 (https://bugzil.la/1853117 - Revert query-stripping allowlist for googleadservices.com)
+  "bugIds": [
+    "1853049"
+  ],
+5. 1866290: 1862274 (https://bugzil.la/1866290 - Revert UrlClassifier feature fingerprinting allowlist for geetest.com)
+  "bugIds": [
+    "1862274"
+  ],
+6. 1869585: 1869507 (https://bugzil.la/1869585 - Revert partitioning skiplist intervention for blogger.com)
+  "bugIds": [
+    "1869507"
+  ],
+7. 1894088: 1882761 (https://bugzil.la/1894088 - Revert fingerprinting protection webcompat overrides for Google domains)
+  "bugIds": [
+    "1882761"
+  ],
+8. 1940042:  (https://bugzil.la/1940042 - Revert partitioning skiplist intervention for bat.bing.com)
+  "bugIds": [
+    ""
+  ],
+9. 1944074: 1934814 (https://bugzil.la/1944074 - Revert partitioning skiplist intervention for www.messenger.com)
+  "bugIds": [
+    "1934814"
+  ],
+10. 1944781: 1935385 (https://bugzil.la/1944781 - Revert partitioning skiplist intervention for onetrust)
+  "bugIds": [
+    "1935385"
+  ],
+11. 1949475: 1943970 (https://bugzil.la/1949475 - Revert partitioning skiplist intervention for boostr.com)
+  "bugIds": [
+    "1943970"
+  ],
+12. 1960851: 1897399 1911297 1912034 1915163 1916633 1920013 1923034 1923365 1924707 1926863 1938112 1942026 1947133 1947175 1950305 1952159 1954451 1967233 (https://bugzil.la/1960851 - Revert global intervention for HubSpot Forms)
+  "bugIds": [
+    "1897399",
+    "1911297",
+    "1912034",
+    "1915163",
+    "1916633",
+    "1920013",
+    "1923034",
+    "1923365",
+    "1924707",
+    "1926863",
+    "1938112",
+    "1942026",
+    "1947133",
+    "1947175",
+    "1950305",
+    "1952159",
+    "1954451",
+    "1967233"
+  ],
+13. 1960862: 1914872 1939463 1947186 1975163 (https://bugzil.la/1960862 - Revert global intervention for a.pub.network)
+  "bugIds": [
+    "1914872",
+    "1939463",
+    "1947186",
+    "1975163"
+  ],
+14. 1960865: 1913097 1914194 1923283 (https://bugzil.la/1960865 - Revert global intervention for Shogun)
+  "bugIds": [
+    "1913097",
+    "1914194",
+    "1923283"
+  ],
+15. 1960868: 1880790 1911307 1946025 1950630 (https://bugzil.la/1960868 - Revert global intervention for SAP OnDemand)
+  "bugIds": [
+    "1880790",
+    "1911307",
+    "1946025",
+    "1950630"
+  ],
+16. 1960871: 1904667 1914175 1927779 1932596 1944311 (https://bugzil.la/1960871 - Revert global intervention for LINE)
+  "bugIds": [
+    "1904667",
+    "1914175",
+    "1927779",
+    "1932596",
+    "1944311"
+  ],
+17. 1960872: 1903859 1909199 1909608 1915611 1923823 1928419 1930596 1930692 1937070 1938390 1939265 1948725 1954938 1956196 1970380 1984025 (https://bugzil.la/1960872 - Revert global intervention for Didomi / privacy-center.org)
+  "bugIds": [
+    "1903859",
+    "1909199",
+    "1909608",
+    "1915611",
+    "1923823",
+    "1928419",
+    "1930596",
+    "1930692",
+    "1937070",
+    "1938390",
+    "1939265",
+    "1948725",
+    "1954938",
+    "1956196",
+    "1970380",
+    "1984025"
+  ],
+18. 1960874: 1731356 1636947 1722853 1724189 1727831 1732852 1734790 1735111 1736981 1739975 1740005 1742766 1744704 1745421 1749304 1750704 1765353 1766969 1774407 1778724 1798907 1911964 1935396 1952853 1957580 1961791 (https://bugzil.la/1960874 - Revert global intervention for VTEX)
+  "bugIds": [
+    "1731356",
+    "1636947",
+    "1722853",
+    "1724189",
+    "1727831",
+    "1732852",
+    "1734790",
+    "1735111",
+    "1736981",
+    "1739975",
+    "1740005",
+    "1742766",
+    "1744704",
+    "1745421",
+    "1749304",
+    "1750704",
+    "1765353",
+    "1766969",
+    "1774407",
+    "1778724",
+    "1798907",
+    "1911964",
+    "1935396",
+    "1952853",
+    "1957580",
+    "1961791"
+  ],
+19. 1960877: 1906062 1906635 1910356 1915376 1923558 1924990 1935932 1944342 1947404 1948891 1949365 1949386 1950395 1952236 1952256 1953121 1956274 1966582 (https://bugzil.la/1960877 - Revert global intervention for Piano / TinyPass)
+  "bugIds": [
+    "1906062",
+    "1906635",
+    "1910356",
+    "1915376",
+    "1923558",
+    "1924990",
+    "1935932",
+    "1944342",
+    "1947404",
+    "1948891",
+    "1949365",
+    "1949386",
+    "1950395",
+    "1952236",
+    "1952256",
+    "1953121",
+    "1956274",
+    "1966582"
+  ],
+20. 1960878: 1779182 1913683 1919209 1953870 (https://bugzil.la/1960878 - Revert global intervention for Salesforce)
+  "bugIds": [
+    "1779182",
+    "1913683",
+    "1919209",
+    "1953870"
+  ],
+21. 1962367: 1844015 1854433 1877437 1893987 1933400 1936585 (https://bugzil.la/1962367 - Revert global intervention for InMobi CMP)
+  "bugIds": [
+    "1844015",
+    "1854433",
+    "1877437",
+    "1893987",
+    "1933400",
+    "1936585"
+  ],
+22. 1962443: 1912947 1918732 1923338 1932153 1933718 1952759 1956265 (https://bugzil.la/1962443 - Revert global intervention for spot.im)
+  "bugIds": [
+    "1912947",
+    "1918732",
+    "1923338",
+    "1932153",
+    "1933718",
+    "1952759",
+    "1956265"
+  ],
+23. 1962463: 1770003 1800899 1931326 1955354 1967227 (https://bugzil.la/1962463 - Revert global intervention for Hotmart)
+  "bugIds": [
+    "1770003",
+    "1800899",
+    "1931326",
+    "1955354",
+    "1967227"
+  ],
+24. 1962564: 1928102 1833251 1849976 1911541 1914200 1915781 1918052 1929025 1951679 (https://bugzil.la/1962564 - Revert global intervention for Zendesk)
+  "bugIds": [
+    "1928102",
+    "1833251",
+    "1849976",
+    "1911541",
+    "1914200",
+    "1915781",
+    "1918052",
+    "1929025",
+    "1951679"
+  ],
+25. 1962673: 1863742 1906603 1925236 1938273 1945436 1946352 1949192 1954779 1962092 (https://bugzil.la/1962673 - Revert global intervention for PerimeterX)
+  "bugIds": [
+    "1863742",
+    "1906603",
+    "1925236",
+    "1938273",
+    "1945436",
+    "1946352",
+    "1949192",
+    "1954779",
+    "1962092"
+  ],
+26. 1962711: 1909607 (https://bugzil.la/1962711 - Revert permanent interventions for blocked domains on podolyaka.ru)
+  "bugIds": [
+    "1909607"
+  ],
+27. 1962712: 1913891 (https://bugzil.la/1962712 - Revert permanent interventions for blocked domains on www.bizjournals.com)
+  "bugIds": [
+    "1913891"
+  ],
+28. 1962713: 1936559 (https://bugzil.la/1962713 - Revert permanent interventions for blocked domains on www.pnsk-online.ru)
+  "bugIds": [
+    "1936559"
+  ],
+29. 1962714: 1935649 (https://bugzil.la/1962714 - Revert permanent interventions for blocked domains on rf4trophies.com)
+  "bugIds": [
+    "1935649"
+  ],
+30. 1962715: 1957906 (https://bugzil.la/1962715 - Revert permanent interventions for blocked domains on www.ursamajorvt.com)
+  "bugIds": [
+    "1957906"
+  ],
+31. 1962716: 1920069 (https://bugzil.la/1962716 - Revert permanent interventions for blocked domains on massolit.io)
+  "bugIds": [
+    "1920069"
+  ],
+32. 1962717: 1913055 (https://bugzil.la/1962717 - Revert permanent interventions for blocked domains on m.sporx.com)
+  "bugIds": [
+    "1913055"
+  ],
+33. 1962718: 1940925 (https://bugzil.la/1962718 - Revert permanent interventions for blocked domains on www.zdnet.com)
+  "bugIds": [
+    "1940925"
+  ],
+34. 1962719: 1957590 1958475 (https://bugzil.la/1962719 - Revert permanent interventions for blocked domains on www.briogeohair.com)
+  "bugIds": [
+    "1957590",
+    "1958475"
+  ],
+35. 1962721: 1932370 (https://bugzil.la/1962721 - Revert permanent interventions for blocked domains on www.buzzfeed.com)
+  "bugIds": [
+    "1932370"
+  ],
+36. 1962722: 1960312 (https://bugzil.la/1962722 - Revert permanent interventions for blocked domains on www.dickblick.com)
+  "bugIds": [
+    "1960312"
+  ],
+37. 1962723: 1961759 (https://bugzil.la/1962723 - Revert permanent interventions for blocked domains on www.fastssh.com)
+  "bugIds": [
+    "1961759"
+  ],
+38. 1962724: 1956434 (https://bugzil.la/1962724 - Revert permanent interventions for blocked domains on kurasu.kyoto)
+  "bugIds": [
+    "1956434"
+  ],
+39. 1962725: 1914166 (https://bugzil.la/1962725 - Revert permanent interventions for blocked domains on www.nu3.ch)
+  "bugIds": [
+    "1914166"
+  ],
+40. 1962726: 1933182 (https://bugzil.la/1962726 - Revert permanent interventions for blocked domains on abfindungshero.de)
+  "bugIds": [
+    "1933182"
+  ],
+41. 1962727: 1934911 (https://bugzil.la/1962727 - Revert permanent interventions for blocked domains on www.cbsnews.com)
+  "bugIds": [
+    "1934911"
+  ],
+42. 1962728: 1921456 (https://bugzil.la/1962728 - Revert permanent interventions for blocked domains on fuliba2023.net)
+  "bugIds": [
+    "1921456"
+  ],
+43. 1962729: 1916443 (https://bugzil.la/1962729 - Revert permanent interventions for blocked domains on anitaku.pe)
+  "bugIds": [
+    "1916443"
+  ],
+44. 1963311: 1907799 (https://bugzil.la/1963311 - Revert permanent interventions for blocked domains on www.pch.com)
+  "bugIds": [
+    "1907799"
+  ],
+45. 1963370: 1880285 1948597 1962066 (https://bugzil.la/1963370 - Revert global intervention for Medallia)
+  "bugIds": [
+    "1880285",
+    "1948597",
+    "1962066"
+  ],
+46. 1963376: 1939253 (https://bugzil.la/1963376 - Revert permanent interventions for blocked domains on www.epocrates.com)
+  "bugIds": [
+    "1939253"
+  ],
+47. 1963377: 1877455 (https://bugzil.la/1963377 - Revert permanent interventions for blocked domains on www.lebonbon.fr)
+  "bugIds": [
+    "1877455"
+  ],
+48. 1963378: 1901221 (https://bugzil.la/1963378 - Revert permanent interventions for blocked domains on flights.skyexpress.gr)
+  "bugIds": [
+    "1901221"
+  ],
+49. 1963379: 1949372 (https://bugzil.la/1963379 - Revert permanent interventions for blocked domains on instapundit.com)
+  "bugIds": [
+    "1949372"
+  ],
+50. 1963380: 1942302 (https://bugzil.la/1963380 - Revert permanent interventions for blocked domains on rafflehouse.com)
+  "bugIds": [
+    "1942302"
+  ],
+51. 1963381: 1828602 (https://bugzil.la/1963381 - Revert permanent interventions for blocked domains on www.ourtime.com)
+  "bugIds": [
+    "1828602"
+  ],
+52. 1963382: 1933714 (https://bugzil.la/1963382 - Revert permanent interventions for blocked domains on uwp-wifi-access-portal.cox.com)
+  "bugIds": [
+    "1933714"
+  ],
+53. 1963383: 1945841 (https://bugzil.la/1963383 - Revert permanent interventions for blocked domains on sferum.ru)
+  "bugIds": [
+    "1945841"
+  ],
+54. 1963384: 1928996 (https://bugzil.la/1963384 - Revert permanent interventions for blocked domains on chat.zalo.me)
+  "bugIds": [
+    "1928996"
+  ],
+55. 1963386: 1928081 (https://bugzil.la/1963386 - Revert permanent interventions for blocked domains on wenku.so.com)
+  "bugIds": [
+    "1928081"
+  ],
+56. 1963387: 1953071 (https://bugzil.la/1963387 - Revert permanent interventions for blocked domains on xstalk.com)
+  "bugIds": [
+    "1953071"
+  ],
+57. 1963388: 1872829 (https://bugzil.la/1963388 - Revert permanent interventions for blocked domains on www.tipranks.com)
+  "bugIds": [
+    "1872829"
+  ],
+58. 1963389: 1847496 (https://bugzil.la/1963389 - Revert permanent interventions for blocked domains on mybkexperience.com)
+  "bugIds": [
+    "1847496"
+  ],
+59. 1963390: 1864438 (https://bugzil.la/1963390 - Revert permanent interventions for blocked domains on redditp.com)
+  "bugIds": [
+    "1864438"
+  ],
+60. 1963391: 1953093 (https://bugzil.la/1963391 - Revert permanent interventions for blocked domains on inspiriert.exlibris.ch)
+  "bugIds": [
+    "1953093"
+  ],
+61. 1963392: 1923375 (https://bugzil.la/1963392 - Revert permanent interventions for blocked domains on firpe.cn)
+  "bugIds": [
+    "1923375"
+  ],
+62. 1963414: 1947391 (https://bugzil.la/1963414 - Revert permanent interventions for blocked domains on try.makevisible.com)
+  "bugIds": [
+    "1947391"
+  ],
+63. 1963416: 1933988 (https://bugzil.la/1963416 - Revert permanent interventions for blocked domains on direct.lc.chat)
+  "bugIds": [
+    "1933988"
+  ],
+64. 1963417: 1912057 (https://bugzil.la/1963417 - Revert permanent interventions for blocked domains on hao.360.com)
+  "bugIds": [
+    "1912057"
+  ],
+65. 1963418: 1912398 (https://bugzil.la/1963418 - Revert permanent interventions for blocked domains on www.ornikar.com)
+  "bugIds": [
+    "1912398"
+  ],
+66. 1963419: 1929890 (https://bugzil.la/1963419 - Revert permanent interventions for blocked domains on knowyourmeme.com)
+  "bugIds": [
+    "1929890"
+  ],
+67. 1963420: 1918435 (https://bugzil.la/1963420 - Revert permanent interventions for blocked domains on photon-reddit.com)
+  "bugIds": [
+    "1918435"
+  ],
+68. 1963421: 1908647 (https://bugzil.la/1963421 - Revert permanent interventions for blocked domains on www.whittard.co.uk)
+  "bugIds": [
+    "1908647"
+  ],
+69. 1963422: 1910634 (https://bugzil.la/1963422 - Revert permanent interventions for blocked domains on www.outdoorsy.com)
+  "bugIds": [
+    "1910634"
+  ],
+70. 1963423: 1926255 (https://bugzil.la/1963423 - Revert permanent interventions for blocked domains on abc7ny.com)
+  "bugIds": [
+    "1926255"
+  ],
+71. 1968970: 1930853 1967239 (https://bugzil.la/1968970 - Revert global intervention for brid.tv)
+  "bugIds": [
+    "1930853",
+    "1967239"
+  ],
+72. 1969882: 1717588 1964696 1966362 (https://bugzil.la/1969882 - Revert global intervention for TurnTo)
+  "bugIds": [
+    "1717588",
+    "1964696",
+    "1966362"
+  ],
+73. 1969919: 1794549 1968450 (https://bugzil.la/1969919 - Revert global intervention for LivePerson)
+  "bugIds": [
+    "1794549",
+    "1968450"
+  ],
+74. 1970377: 1926488 (https://bugzil.la/1970377 - Revert partitioning skiplist intervention for Google Chat)
+  "bugIds": [
+    "1926488"
+  ],
+75. 1970603: 1915580 1922248 1924074 1926861 1943292 1961174 (https://bugzil.la/1970603 - Revert global intervention for Wistia)
+  "bugIds": [
+    "1915580",
+    "1922248",
+    "1924074",
+    "1926861",
+    "1943292",
+    "1961174"
+  ],
+76. 1971535: 1957427 (https://bugzil.la/1971535 - Revert fingerprinting protection webcompat overrides for wpy.fyi domains)
+  "bugIds": [
+    "1957427"
+  ],
+77. 1972018: 1921732 1930700 1960830 1969420 (https://bugzil.la/1972018 - Revert global intervention for Rebuy)
+  "bugIds": [
+    "1921732",
+    "1930700",
+    "1960830",
+    "1969420"
+  ],
+78. 1973175: 1970078 (https://bugzil.la/1973175 - Revert permanent interventions for blocked domains on play.virginmediatelevision.ie)
+  "bugIds": [
+    "1970078"
+  ],
+79. 1973185: 1957061 (https://bugzil.la/1973185 - Revert permanent interventions for blocked domains on www.tv8.it)
+  "bugIds": [
+    "1957061"
+  ],

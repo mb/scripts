@@ -548,7 +548,7 @@ impl Request {
                                     }}
                                     break;
                                 case "postMessage":
-                                    document.getElementById("postMessages").innerText += e.origin + ": cookie=" + JSON.stringify(e.data.value) + "\n";
+                                    document.getElementById("postMessages").innerText += e.origin + ": cookie=" + e.data.value + "\n";
                                     break;
                             }}
                         }})

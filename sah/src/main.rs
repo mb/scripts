@@ -453,6 +453,7 @@ impl Request {
         let css = Request::table("css");
         let js = Request::table("js");
         let iframe_id = Uuid::new_v4();
+        let cookie_json = self.get(Header::Cookie, Escape::Json);
         let iframe_url = self.get_iframe_url();
         let own_ident = match url.domain() {
             Some("sah.neon.rocks") => "rocks",
@@ -506,6 +507,16 @@ impl Request {
                             if (window.parent !== window) {{
                                 window.parent.postMessage({{ type: "nav", url: own_ident }}, "*");
                             }}
+                            sendPostMessage();
+                        }}
+
+                        function sendPostMessage() {{
+                            const msg = {{ type: "postMessage", value: "{cookie_json}" }};
+                            if (window.parent !== window) {{
+                                window.parent.postMessage(msg, "*");
+                            }} else if (window.opener) {{
+                                window.opener.postMessage(msg, "*");
+                            }}
                         }}
 
                         // update frame size
@@ -535,6 +546,9 @@ impl Request {
                                         console.log("update height to " + e.data.height + 50);
                                         sendHeightToParent();
                                     }}
+                                    break;
+                                case "postMessage":
+                                    document.getElementById("postMessages").innerText += e.origin + ": " + JSON.stringify(e.data) + "\n";
                                     break;
                             }}
                         }})
@@ -627,6 +641,9 @@ impl Request {
                     </script>
                     <p><button onclick="window.hasStorageAccess();"><code>document.hasStorageAccess</code></button> <span id="has-storage-access"></span></p>
                     <p><button onclick="window.requestStorageAccess();"><code>document.requestStorageAccess</code></button> <span id="request-storage-access"></span></p>
+                    <p><button onclick="sendPostMessage()">postMessage</button></p>
+                    <h2>received postMessages</h2>
+                    <div id="postMessages" style="white-space: pre-wrap"></div>
                     <h2>Fetch headers <a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#including_credentials">with credentials</a><small> (<a href="/storage-access/fetch.json{query_params}">/storage-access/fetch.json{query_params}</a>)</small></h2>
                     {fetch_credential}
                     <h2>Fetch headers (<a href="/storage-access/fetch.json{query_params}">/storage-access/fetch.json{query_params}</a>)</small></h2>

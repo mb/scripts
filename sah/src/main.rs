@@ -548,7 +548,7 @@ impl Request {
                                     }}
                                     break;
                                 case "postMessage":
-                                    document.getElementById("postMessages").innerText += e.origin + ": " + JSON.stringify(e.data) + "\n";
+                                    document.getElementById("postMessages").innerText += e.origin + ": cookie=" + JSON.stringify(e.data.value) + "\n";
                                     break;
                             }}
                         }})
@@ -641,8 +641,8 @@ impl Request {
                     </script>
                     <p><button onclick="window.hasStorageAccess();"><code>document.hasStorageAccess</code></button> <span id="has-storage-access"></span></p>
                     <p><button onclick="window.requestStorageAccess();"><code>document.requestStorageAccess</code></button> <span id="request-storage-access"></span></p>
-                    <p><button onclick="sendPostMessage()">postMessage</button></p>
-                    <h2>received postMessages</h2>
+                    <p><button onclick="sendPostMessage()">cookie postMessage</button></p>
+                    <h2>Received cookie postMessages</h2>
                     <div id="postMessages" style="white-space: pre-wrap"></div>
                     <h2>Fetch headers <a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#including_credentials">with credentials</a><small> (<a href="/storage-access/fetch.json{query_params}">/storage-access/fetch.json{query_params}</a>)</small></h2>
                     {fetch_credential}

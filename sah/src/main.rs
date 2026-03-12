@@ -511,7 +511,7 @@ impl Request {
                         }}
 
                         function sendPostMessage() {{
-                            const msg = {{ type: "postMessage", value: "{cookie_json}" }};
+                            const msg = {{ type: "postMessage", value: {cookie_json} }};
                             if (window.parent !== window) {{
                                 window.parent.postMessage(msg, "*");
                             }} else if (window.opener) {{

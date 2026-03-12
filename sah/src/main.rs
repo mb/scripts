@@ -487,7 +487,7 @@ impl Request {
             .append_pair("target", url.as_str())
             .finish();
         let response = formatdoc!(
-            r#"
+            r##"
             <!DOCTYPE html>
             <html>
                 <head><title>Storage-Access-API test ground</title></head>
@@ -556,6 +556,11 @@ impl Request {
                             <td class="neon"><a href="https://sah.neon.rocks/storage-access/">index</a></td>
                             <td class="wiki"><a href="https://sah.yet.wiki/storage-access/">index</a></td>
                             <td class="cx"><a href="https://sah.yet.cx/storage-access/">index</a></td>
+                        </tr>
+                        <tr>
+                            <td class="neon"><a href="#" onclick="window.open('https://sah.neon.rocks/storage-access/'); return false;">popup</a></td>
+                            <td class="wiki"><a href="#" onclick="window.open('https://sah.yet.wiki/storage-access/'); return false;">popup</a></td>
+                            <td class="cx"><a href="#" onclick="window.open('https://sah.yet.cx/storage-access/'); return false;">popup</a></td>
                         </tr>
                         <tr>
                             <td class="neon"><a href="https://sah.neon.rocks/storage-access/auth?{target}">auth</a></td>
@@ -690,7 +695,7 @@ impl Request {
                     </table>
                     <iframe name="{iframe_id}" src="{iframe_url}" width="100%" height="100"></iframe>
                 </body>
-            </html>"#,
+            </html>"##,
             host = self.get(Header::Host, Escape::Html),
             origin = self.get(Header::Origin, Escape::Html),
             referer = self.get(Header::Referer, Escape::Html),

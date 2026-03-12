@@ -507,7 +507,6 @@ impl Request {
                             if (window.parent !== window) {{
                                 window.parent.postMessage({{ type: "nav", url: own_ident }}, "*");
                             }}
-                            sendPostMessage();
                         }}
 
                         function sendPostMessage() {{
@@ -530,7 +529,13 @@ impl Request {
                                 );
                             }}
                         }}
-                        window.addEventListener("load", sendHeightToParent);
+
+                        function onLoad() {{
+                            sendHeightToParent();
+                            sendPostMessage();
+                        }}
+
+                        window.addEventListener("load", onLoad);
                         window.addEventListener("resize", sendHeightToParent);
 
                         // propagate
